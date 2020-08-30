@@ -1,0 +1,16 @@
+# Installation
+> `npm install --save @types/node-schedule`
+
+# Summary
+This package contains type definitions for node-schedule (https://github.com/node-schedule/node-schedule).
+
+# Details
+Files were exported from https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/node-schedule.
+
+### Additional Details
+ * Last updated: Fri, 20 Dec 2019 07:06:51 GMT
+ * Dependencies: [@types/node](https://npmjs.com/package/@types/node)
+ * Global values: none
+
+# Credits
+These definitions were written by Cyril Schumacher (https://github.com/cyrilschumacher), Florian Plattner (https://github.com/flowpl), and Tieu Philippe Khim (https://github.com/spike008t).
