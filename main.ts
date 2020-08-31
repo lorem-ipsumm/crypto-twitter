@@ -18,7 +18,7 @@ const client = new Twitter({
 // make a new tweet
 async function newTweet(coinData: any) {
     let tweet = "New Coingecko Listing!\n" + 
-                coinData.name + " ($" + coinData.ticker +")" +
+                coinData.name + " / $" + coinData.ticker +
                 "\n\nPrice: " + coinData.price + 
                 "\n1h Change: " + coinData.hour +
                 "\n24h Change: " + coinData.day + 
