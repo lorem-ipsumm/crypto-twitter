@@ -36,6 +36,7 @@ async function newTweet(coinData: any) {
         console.log(err);
     })
 
+    console.log(tweet);
 }
 
 // scrape the recently added page
@@ -56,12 +57,19 @@ async function scrape() {
         coinName = nameInfo[0];
         coinTicker = nameInfo[1];
 
+        // get data
         let price = $(elem).find(".td-price span").text().trim();
         let hourChange = $(elem).find(".td-change1h span").text().trim();
         let dayChange = $(elem).find(".td-change24h span").text().trim();
         let volume = $(elem).find(".td-liquidity_score span").text().trim();
         let marketCap = $(elem).find(".td-market_cap").text().trim();
         let url = "https://www.coingecko.com" + $(elem).find(".coin-name a").attr("href");
+
+        // check if price change data has been added
+        if (hourChange.length <= 1)
+            hourChange = "N/A";
+        if (dayChange.length <= 1)
+            dayChange = "N/A";
 
         const coinData = {
             name: coinName,
@@ -79,9 +87,8 @@ async function scrape() {
             if (err) console.log(err);
 
             // check if coin has already been added
-            // and if the price is listed
-            if (data.indexOf(coinName) === -1 && (hourChange.length > 1 && dayChange.length > 1)) {
-
+            if (data.indexOf(coinName) === -1) {
+                // && (hourChange.length > 1 && dayChange.length > 1)
                 // append coin name to text file
                 fs.appendFile("coins.txt", "\n" + coinName + "(" + coinTicker + ")", (err) => {
                     if (err) console.log(err);
