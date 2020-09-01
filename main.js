@@ -100,6 +100,7 @@ function scrape() {
                         var nameInfo = $(elem).find(".coin-name a").text().trim().split("\n").join().split(",,");
                         coinName = nameInfo[0];
                         coinTicker = nameInfo[1];
+                        coinTicker = coinTicker.trim();
                         // get data
                         var price = $(elem).find(".td-price span").text().trim();
                         var hourChange = $(elem).find(".td-change1h span").text().trim();
@@ -123,14 +124,14 @@ function scrape() {
                             url: url
                         };
                         // check our saved file
+                        // TODO: no need to read the file in the loop
                         fs.readFile("coins.txt", function (err, data) {
                             if (err) {
                                 console.log(err);
                                 return;
                             }
                             // check if coin has already been added
-                            if (data.indexOf(coinName) === -1) {
-                                // && (hourChange.length > 1 && dayChange.length > 1)
+                            if (data.indexOf(coinName + "(" + coinTicker + ")") === -1) {
                                 // append coin name to text file
                                 fs.appendFile("coins.txt", "\n" + coinName + "(" + coinTicker + ")", function (err) {
                                     if (err)
