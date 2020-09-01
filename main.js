@@ -124,8 +124,10 @@ function scrape() {
                         };
                         // check our saved file
                         fs.readFile("coins.txt", function (err, data) {
-                            if (err)
+                            if (err) {
                                 console.log(err);
+                                return;
+                            }
                             // check if coin has already been added
                             if (data.indexOf(coinName) === -1) {
                                 // && (hourChange.length > 1 && dayChange.length > 1)

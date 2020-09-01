@@ -84,7 +84,11 @@ async function scrape() {
 
         // check our saved file
         fs.readFile("coins.txt", (err, data) => {
-            if (err) console.log(err);
+
+            if (err){
+                console.log(err);
+                return;
+            }
 
             // check if coin has already been added
             if (data.indexOf(coinName) === -1) {
