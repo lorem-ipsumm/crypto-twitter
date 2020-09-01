@@ -56,6 +56,7 @@ async function scrape() {
         let nameInfo = $(elem).find(".coin-name a").text().trim().split("\n").join().split(",,");
         coinName = nameInfo[0];
         coinTicker = nameInfo[1];
+        coinTicker = coinTicker.trim();
 
         // get data
         let price = $(elem).find(".td-price span").text().trim();
@@ -83,6 +84,7 @@ async function scrape() {
         };
 
         // check our saved file
+        // TODO: no need to read the file in the loop
         fs.readFile("coins.txt", (err, data) => {
 
             if (err){

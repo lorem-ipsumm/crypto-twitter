@@ -129,8 +129,7 @@ function scrape() {
                                 return;
                             }
                             // check if coin has already been added
-                            if (data.indexOf(coinName) === -1) {
-                                // && (hourChange.length > 1 && dayChange.length > 1)
+                            if (data.indexOf(coinName + "(" + coinTicker + ")") === -1) {
                                 // append coin name to text file
                                 fs.appendFile("coins.txt", "\n" + coinName + "(" + coinTicker + ")", function (err) {
                                     if (err)
