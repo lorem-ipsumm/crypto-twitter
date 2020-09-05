@@ -50,7 +50,6 @@ async function newTweet(coinData: any) {
 // scrape the recently added page
 async function scrape() {
 
-
     console.log(new Date().toJSON());
     console.log("scraping");
 
