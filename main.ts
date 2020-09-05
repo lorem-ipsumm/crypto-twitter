@@ -4,9 +4,13 @@ import * as fs from 'fs';
 const Twitter = require("twitter-lite");
 
 // provide your own config with keys
+// comment this section out if you don't have keys and
+// and you just want to scrape Coingecko
 const Config = require("./config");
 
 // setup client
+// comment this section out if you don't have keys and
+// and you just want to scrape Coingecko
 const client = new Twitter({
     consumer_key: Config.consumer_key,
     consumer_secret: Config.consumer_secret,
@@ -17,37 +21,48 @@ const client = new Twitter({
 
 // make a new tweet
 async function newTweet(coinData: any) {
+
+    // build tweet
     let tweet = "New Coingecko Listing!\n" + 
                 coinData.name + " / $" + coinData.ticker +
                 "\n\nPrice: " + coinData.price + 
                 "\n1h Change: " + coinData.hour +
                 "\n24h Change: " + coinData.day + 
                 "\n24h Volume: " + coinData.volume + 
-                "\nMkt Cap: " + coinData.marketCap + 
                 "\n\n" + coinData.url;
 
+    // post the tweet
     await client.post("statuses/update", {
         status: tweet
     })
     .then(() => {
-        console.log("tweet sent");
+        console.log("tweet sent: \n" + tweet);
     })
     .catch((err: any) => {
         console.log(err);
     })
 
-    console.log(tweet);
 }
+
 
 // scrape the recently added page
 async function scrape() {
+
+    // try and get text in coins.txt
+    let coins = "";
+    try {
+        coins = fs.readFileSync("coins.txt", "utf8");
+    } catch(err) {
+        console.log(err);
+        return;
+    }
 
     // get site html
     const html = await axios.get("https://www.coingecko.com/en/coins/recently_added");
     const $ = await cheerio.load(html.data);
 
     // go through all table items
-    $('tr', 'tbody').each((i, elem) => {
+    $('tr', 'tbody').each(async (i, elem) => {
 
         let coinName: string;
         let coinTicker: string;
@@ -68,9 +83,9 @@ async function scrape() {
 
         // check if price change data has been added
         if (hourChange.length <= 1)
-            hourChange = "N/A";
+            hourChange = "?";
         if (dayChange.length <= 1)
-            dayChange = "N/A";
+            dayChange = "?";
 
         const coinData = {
             name: coinName,
@@ -83,28 +98,19 @@ async function scrape() {
             url: url
         };
 
-        // check our saved file
-        // TODO: no need to read the file in the loop
-        fs.readFile("coins.txt", (err, data) => {
+        // check if coin has already been added
+        if (coins.indexOf(coinName + "(" + coinTicker + ")") === -1) {
 
-            if (err){
-                console.log(err);
-                return;
-            }
+            console.log("New coin found: " + coinName + " / $" + coinTicker);
 
+            // append coin name to text file
+            await fs.appendFile("coins.txt", "\n" + coinName + "(" + coinTicker + ")", (err) => {
+                if (err) console.log(err);
+            });
 
-            // check if coin has already been added
-            if (data.indexOf(coinName + "(" + coinTicker + ")") === -1) {
+            newTweet(coinData);
 
-                // append coin name to text file
-                fs.appendFile("coins.txt", "\n" + coinName + "(" + coinTicker + ")", (err) => {
-                    if (err) console.log(err);
-                });
-
-                newTweet(coinData);
-
-            }
-        });
+        }
 
     });
 
@@ -118,4 +124,6 @@ console.log("starting!");
 
 // scrape every 10 minutes
 scrape();
-setInterval(() => {scrape()}, 600000);
+setInterval(() => {
+    scrape()
+}, 600000);
