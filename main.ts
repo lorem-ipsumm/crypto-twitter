@@ -36,7 +36,10 @@ async function newTweet(coinData: any) {
         status: tweet
     })
     .then(() => {
+<<<<<<< HEAD
         console.log(new Date().toJSON());
+=======
+>>>>>>> 4bf87b8f6f5aa74891bdb2cd94512c36bf299d31
         console.log("tweet sent: \n" + tweet);
     })
     .catch((err: any) => {
@@ -50,10 +53,13 @@ async function newTweet(coinData: any) {
 // scrape the recently added page
 async function scrape() {
 
+<<<<<<< HEAD
 
     console.log(new Date().toJSON());
     console.log("scraping");
 
+=======
+>>>>>>> 4bf87b8f6f5aa74891bdb2cd94512c36bf299d31
     // try and get text in coins.txt
     let coins = "";
     try {
@@ -107,7 +113,10 @@ async function scrape() {
         // check if coin has already been added
         if (coins.indexOf(coinName + "(" + coinTicker + ")") === -1) {
 
+<<<<<<< HEAD
             console.log(new Date().toJSON());
+=======
+>>>>>>> 4bf87b8f6f5aa74891bdb2cd94512c36bf299d31
             console.log("New coin found: " + coinName + " / $" + coinTicker);
 
             // append coin name to text file
