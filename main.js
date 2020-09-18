@@ -72,10 +72,7 @@ function newTweet(coinData) {
                             status: tweet
                         })
                             .then(function () {
-<<<<<<< HEAD
                             console.log(new Date().toJSON());
-=======
->>>>>>> 4bf87b8f6f5aa74891bdb2cd94512c36bf299d31
                             console.log("tweet sent: \n" + tweet);
                         })["catch"](function (err) {
                             console.log(new Date().toJSON());
@@ -97,11 +94,8 @@ function scrape() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-<<<<<<< HEAD
                     console.log(new Date().toJSON());
                     console.log("scraping");
-=======
->>>>>>> 4bf87b8f6f5aa74891bdb2cd94512c36bf299d31
                     coins = "";
                     try {
                         coins = fs.readFileSync("coins.txt", "utf8");
@@ -148,10 +142,7 @@ function scrape() {
                                         url: url
                                     };
                                     if (!(coins.indexOf(coinName + "(" + coinTicker + ")") === -1)) return [3 /*break*/, 2];
-<<<<<<< HEAD
                                     console.log(new Date().toJSON());
-=======
->>>>>>> 4bf87b8f6f5aa74891bdb2cd94512c36bf299d31
                                     console.log("New coin found: " + coinName + " / $" + coinTicker);
                                     // append coin name to text file
                                     return [4 /*yield*/, fs.appendFile("coins.txt", "\n" + coinName + "(" + coinTicker + ")", function (err) {
@@ -161,10 +152,7 @@ function scrape() {
                                 case 1:
                                     // append coin name to text file
                                     _a.sent();
-<<<<<<< HEAD
-=======
                                     newTweet(coinData);
->>>>>>> 4bf87b8f6f5aa74891bdb2cd94512c36bf299d31
                                     _a.label = 2;
                                 case 2: return [2 /*return*/];
                             }

@@ -2,6 +2,7 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import * as fs from 'fs';
 const Twitter = require("twitter-lite");
+const hooman = require('hooman');
 
 // provide your own config with keys
 // comment this section out if you don't have keys and
@@ -46,6 +47,7 @@ async function newTweet(coinData: any) {
 
 }
 
+// const sleep = (waitTimeInMs: number) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
 
 // scrape the recently added page
 async function scrape() {
@@ -62,9 +64,23 @@ async function scrape() {
         return;
     }
 
-    // get site html
-    const html = await axios.get("https://www.coingecko.com/en/coins/recently_added");
-    const $ = await cheerio.load(html.data);
+    // html data var
+    let html = "";
+
+    // try and get the html data
+    // hooman is used to get around cloudfare
+    try {
+        const response = await hooman.get('https://www.coingecko.com/en/coins/recently_added');
+        html = response.body;
+    } catch (error) {
+
+        // catch error and exit
+        console.log(error.response.body);
+        return;
+    }
+
+    // load html with cheerio
+    const $ = await cheerio.load(html);
 
     // go through all table items
     $('tr', 'tbody').each(async (i, elem) => {
@@ -106,6 +122,10 @@ async function scrape() {
         // check if coin has already been added
         if (coins.indexOf(coinName + "(" + coinTicker + ")") === -1) {
 
+            // sleep after finding new coins
+            // this is for if the bot breaks and misses coins
+            // await sleep(1000);
+
             console.log(new Date().toJSON());
             console.log("New coin found: " + coinName + " / $" + coinTicker);
 
@@ -117,10 +137,7 @@ async function scrape() {
             newTweet(coinData);
 
         }
-
     });
-
-
 }
 
 
