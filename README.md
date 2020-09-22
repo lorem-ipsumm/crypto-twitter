@@ -11,9 +11,10 @@ Feel free to make a pull request if you want to implement a useful feature. You'
  - New name / icon for the bot. Now that it scrapes more than just CoinGecko, a new name was needed
 
 
-TODO:
+# TODO:
  - Uniswap scraping
  - Updates on coin growth
+ - More interactivity. (provide price updates if someone likes/retweets?)
 
 
 You can follow it here:
