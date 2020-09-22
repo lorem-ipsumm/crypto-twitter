@@ -19,16 +19,26 @@ const client = new Twitter({
     access_token_secret: Config.access_token_secret
 });
 
+// variable to hold coins.txt data
+// TODO: convert to JSON / easier to parse format
+let coins = "";
+
+interface CoinData {
+    name: string,
+    ticker: string,
+    price: string,
+    volume: string,
+    url: string,
+    site: string
+}
 
 // make a new tweet
-async function newTweet(coinData: any) {
+async function newTweet(coinData: CoinData) {
 
     // build tweet
-    let tweet = "New Coingecko Listing!\n" + 
+    let tweet = "New " + coinData.site + " Listing!\n\n" + 
                 coinData.name + " / $" + coinData.ticker +
-                "\n\nPrice: " + coinData.price + 
-                "\n1h Change: " + coinData.hour +
-                "\n24h Change: " + coinData.day + 
+                "\nPrice: " + coinData.price + 
                 "\n24h Volume: " + coinData.volume + 
                 "\n\n" + coinData.url;
 
@@ -47,35 +57,105 @@ async function newTweet(coinData: any) {
 
 }
 
-// const sleep = (waitTimeInMs: number) => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
+// load coins.txt data into coins global var
+async function loadCoins() {
 
-// scrape the recently added page
-async function scrape() {
-
-    console.log(new Date().toJSON());
-    console.log("scraping");
-
-    // try and get text in coins.txt
-    let coins = "";
     try {
         coins = fs.readFileSync("coins.txt", "utf8");
+    } catch(err) {
+        coins = "";
+        console.log(err);
+    }
+
+    return coins.length > 0;
+}
+
+// save new coin data to coins.txt
+async function saveCoins(coinData: CoinData) {
+
+    // check if coin has already been added
+    if (coins.indexOf(coinData.name+ "(" + coinData.ticker + "): " + coinData.site) === -1) {
+
+        // sleep after finding new coins
+        // this is for if the bot breaks and misses coins
+        // await sleep(1000);
+
+        console.log(new Date().toJSON());
+        console.log("New coin found: " + coinData.name + " / $" + coinData.ticker);
+
+        // append coin name to text file
+        await fs.appendFile("coins.txt", "\n" + coinData.name+ "(" + coinData.ticker + "): " + coinData.site, (err) => {
+            if (err) console.log(err);
+        });
+
+        newTweet(coinData);
+
+    }
+
+}
+
+
+// scrape coinmarketcap
+async function coinmarketcapScrape() {
+
+    // try and read coins.txt and make get request
+    let html = "";
+
+    try {
+        const response = await hooman.get('https://coinmarketcap.com/new/');
+        html = response.body;
     } catch(err) {
         console.log(err);
         return;
     }
 
-    // html data var
+    // load html with cheerio
+    const $ = await cheerio.load(html);
+
+    // go through all table items
+    $('tr.cmc-table-row').each(async (i, elem) => {
+
+        let coinName: string;
+        let coinTicker: string;
+
+        // name and ticker
+        coinName = $(elem).find(".cmc-table__column-name").text().trim();
+        coinTicker = $(elem).find(".cmc-table__cell--sort-by__symbol").text().trim();
+
+        // get data
+        let price = $(elem).find(".cmc-table__cell--sort-by__price").text().trim();
+        let volume = $(elem).find(".cmc-table__cell--sort-by__volume-24-h").text().trim();
+        let url = "https://www.coinmarketcap.com" + $(elem).find(".cmc-table__column-name a").attr("href");
+
+        const coinData:CoinData = {
+            name: coinName,
+            ticker: coinTicker,
+            price: price,
+            volume: volume,
+            url: url,
+            site: "CoinMarketCap"
+        };
+
+
+        saveCoins(coinData);
+    });
+
+
+}
+
+// scrape the recently added page
+async function coingeckoScrape() {
+
+    console.log(new Date().toJSON());
+    console.log("scraping");
+
     let html = "";
 
-    // try and get the html data
-    // hooman is used to get around cloudfare
     try {
         const response = await hooman.get('https://www.coingecko.com/en/coins/recently_added');
         html = response.body;
-    } catch (error) {
-
-        // catch error and exit
-        console.log(error.response.body);
+    } catch(err) {
+        console.log(err);
         return;
     }
 
@@ -96,47 +176,23 @@ async function scrape() {
 
         // get data
         let price = $(elem).find(".td-price span").text().trim();
-        let hourChange = $(elem).find(".td-change1h span").text().trim();
-        let dayChange = $(elem).find(".td-change24h span").text().trim();
+        // let hourChange = $(elem).find(".td-change1h span").text().trim();
+        // let dayChange = $(elem).find(".td-change24h span").text().trim();
         let volume = $(elem).find(".td-liquidity_score span").text().trim();
-        let marketCap = $(elem).find(".td-market_cap").text().trim();
+        // let marketCap = $(elem).find(".td-market_cap").text().trim();
         let url = "https://www.coingecko.com" + $(elem).find(".coin-name a").attr("href");
 
-        // check if price change data has been added
-        if (hourChange.length <= 1)
-            hourChange = "?";
-        if (dayChange.length <= 1)
-            dayChange = "?";
-
-        const coinData = {
+        const coinData:CoinData = {
             name: coinName,
             ticker: coinTicker,
             price: price,
-            hour: hourChange,
-            day: dayChange,
             volume: volume,
-            marketCap: marketCap,
-            url: url
+            url: url,
+            site: "CoinGecko"
         };
 
-        // check if coin has already been added
-        if (coins.indexOf(coinName + "(" + coinTicker + ")") === -1) {
+        saveCoins(coinData);
 
-            // sleep after finding new coins
-            // this is for if the bot breaks and misses coins
-            // await sleep(1000);
-
-            console.log(new Date().toJSON());
-            console.log("New coin found: " + coinName + " / $" + coinTicker);
-
-            // append coin name to text file
-            await fs.appendFile("coins.txt", "\n" + coinName + "(" + coinTicker + ")", (err) => {
-                if (err) console.log(err);
-            });
-
-            newTweet(coinData);
-
-        }
     });
 }
 
@@ -145,8 +201,17 @@ async function scrape() {
 
 console.log("starting!");
 
+
+// load coins.txt before scraping
+if (loadCoins()) {
+    coingeckoScrape();
+    coinmarketcapScrape();
+}
+
 // scrape every 10 minutes
-scrape();
 setInterval(() => {
-    scrape()
+    if (loadCoins()) {
+        coingeckoScrape();
+        coinmarketcapScrape();
+    }
 }, 600000);
