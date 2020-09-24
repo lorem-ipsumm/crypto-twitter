@@ -1,4 +1,4 @@
-# crypto-twitter
+# [Crypto Gems Bot](https://twitter.com/CryptoGemsBot)
 
 This is a bot that scrapes CoinGecko and CoinMarketCap and makes a tweet whenever there is a new coin added. This is to help people find low-market-cap gems before they blast off 100% - 500%.
 
