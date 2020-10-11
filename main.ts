@@ -3,6 +3,10 @@ import * as cheerio from 'cheerio';
 import * as fs from 'fs';
 const Twitter = require("twitter-lite");
 const hooman = require('hooman');
+const CoinCodex = require('coincodex-api');
+
+// create CoinCodex API client
+const codex = new CoinCodex();
 
 // provide your own config with keys
 // comment this section out if you don't have keys and
@@ -40,6 +44,7 @@ async function newTweet(coinData: CoinData) {
                 coinData.name + " / $" + coinData.ticker +
                 "\nPrice: " + coinData.price + 
                 "\n24h Volume: " + coinData.volume + 
+                "\n#crypto #gem #eth #defi" + 
                 "\n\n" + coinData.url;
 
     // post the tweet
@@ -197,11 +202,50 @@ async function coingeckoScrape() {
 }
 
 
+// scrape CoinCodex
+async function scrapeCodex() {
+    let data = await codex.coins.all();
+    console.log(data);
+}
+
+
+// scrape Coin360
+async function scrape360() {
+
+    let html:any;
+
+    try {
+        const response = await hooman.get('https://api.coin360.com/coin/latest');
+        html = JSON.parse(response.body);
+    } catch(err) {
+        console.log(err);
+        return;
+    }
+
+    // exit if no html
+    if (!html)
+        return;
+
+
+    let x = 0;
+    for (const key in html) {
+        if (html.hasOwnProperty(key)) {
+            console.log(html[key])
+            console.log(key);
+        }
+
+
+        if (x++ > 10)
+            break;
+    }
+
+    // load html with cheerio
+    const $ = await cheerio.load(html);
+
+}
 
 
 console.log("starting!");
-
-
 // load coins.txt before scraping
 if (loadCoins()) {
     coingeckoScrape();
