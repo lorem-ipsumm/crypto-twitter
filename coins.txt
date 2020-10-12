@@ -200,8 +200,6 @@ Golff(GOF): CoinGecko
 ASLA(ASLA): CoinGecko
 QANplatform(QARK): CoinGecko
 UnityDAO(UTY): CoinGecko
-Dogeswap(DOGES): CoinGecko
-Dandy Dego(DANDY): CoinGecko
 Seal Finance(SEAL): CoinGecko
 Juggernaut(JGN): CoinGecko
 LimitSwap(LIMIT): CoinGecko
@@ -300,7 +298,6 @@ DODO(DODO): CoinGecko
 YFarmLand Token(YFARMER): CoinGecko
 SUP(SUP): CoinMarketCap
 Doki Doki Finance(DOKI): CoinMarketCap
-Dogeswap(DOGES): CoinMarketCap
 POP Network Token(POP): CoinMarketCap
 TopCoinFX(TCFX): CoinMarketCap
 Stabilize(STBZ): CoinMarketCap
@@ -398,6 +395,4 @@ Safari(SFR): CoinMarketCap
 TitanSwap(TITAN): CoinMarketCap
 UNII Finance(UNII): CoinMarketCap
 Polkastarter(POLS): CoinMarketCap
-Non-Fungible Yearn(NFY): CoinGecko
-SHAKE(SHAKE): CoinGecko
 Yearn Finance Ecosystem(YFIEC): CoinGecko
