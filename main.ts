@@ -1,9 +1,10 @@
-import axios from 'axios';
 import * as cheerio from 'cheerio';
 import * as fs from 'fs';
 const Twitter = require("twitter-lite");
 const hooman = require('hooman');
 const CoinCodex = require('coincodex-api');
+const Discord = require('discord.js');
+const discord = new Discord.Client();
 
 // create CoinCodex API client
 const codex = new CoinCodex();
@@ -23,6 +24,9 @@ const client = new Twitter({
     access_token_secret: Config.access_token_secret
 });
 
+// login to discord
+discord.login(Config.discord_token);
+
 // variable to hold coins.txt data
 // TODO: convert to JSON / easier to parse format
 let coins = "";
@@ -36,6 +40,18 @@ interface CoinData {
     site: string
 }
 
+
+// log output and error message in a discord server
+async function log(message: string, err?: boolean | null) {
+    
+    // mention me if there is an error
+    if (err)
+        discord.channels.cache.get(Config.discord_channel).send("<@" + Config.discord_mention + ">\n" + message);
+    else 
+        discord.channels.cache.get(Config.discord_channel).send(message);
+
+}
+
 // make a new tweet
 async function newTweet(coinData: CoinData) {
 
@@ -47,18 +63,19 @@ async function newTweet(coinData: CoinData) {
                 "\n#crypto #gem #eth #defi" + 
                 "\n\n" + coinData.url;
 
+    /*
     // post the tweet
     await client.post("statuses/update", {
         status: tweet
     })
     .then(() => {
-        console.log(new Date().toJSON());
-        console.log("tweet sent: \n" + tweet);
+        log("tweet sent: \n" + tweet);
     })
     .catch((err: any) => {
-        console.log(new Date().toJSON());
-        console.log(err);
+        log(err, true);
     })
+    */
+   log(tweet);
 
 }
 
@@ -69,7 +86,7 @@ async function loadCoins() {
         coins = fs.readFileSync("coins.txt", "utf8");
     } catch(err) {
         coins = "";
-        console.log(err);
+        log(err,true);
     }
 
     return coins.length > 0;
@@ -85,12 +102,12 @@ async function saveCoins(coinData: CoinData) {
         // this is for if the bot breaks and misses coins
         // await sleep(1000);
 
-        console.log(new Date().toJSON());
-        console.log("New coin found: " + coinData.name + " / $" + coinData.ticker);
+        log("New coin found: " + coinData.name + " / $" + coinData.ticker);
+
 
         // append coin name to text file
         await fs.appendFile("coins.txt", "\n" + coinData.name+ "(" + coinData.ticker + "): " + coinData.site, (err) => {
-            if (err) console.log(err);
+            if (err) log(err.message,true);
         });
 
         newTweet(coinData);
@@ -103,6 +120,8 @@ async function saveCoins(coinData: CoinData) {
 // scrape coinmarketcap
 async function coinmarketcapScrape() {
 
+    log("scraping CoinMarketCap");
+
     // try and read coins.txt and make get request
     let html = "";
 
@@ -110,7 +129,7 @@ async function coinmarketcapScrape() {
         const response = await hooman.get('https://coinmarketcap.com/new/');
         html = response.body;
     } catch(err) {
-        console.log(err);
+        log(err, true);
         return;
     }
 
@@ -151,8 +170,7 @@ async function coinmarketcapScrape() {
 // scrape the recently added page
 async function coingeckoScrape() {
 
-    console.log(new Date().toJSON());
-    console.log("scraping");
+    log("scraping CoinGecko");
 
     let html = "";
 
@@ -160,7 +178,7 @@ async function coingeckoScrape() {
         const response = await hooman.get('https://www.coingecko.com/en/coins/recently_added');
         html = response.body;
     } catch(err) {
-        console.log(err);
+        log(err, true);
         return;
     }
 
@@ -218,7 +236,7 @@ async function scrape360() {
         const response = await hooman.get('https://api.coin360.com/coin/latest');
         html = JSON.parse(response.body);
     } catch(err) {
-        console.log(err);
+        log(err, true);
         return;
     }
 
@@ -244,18 +262,33 @@ async function scrape360() {
 
 }
 
+// start scraping process
+function scrape() {
 
-console.log("starting!");
-// load coins.txt before scraping
-if (loadCoins()) {
+    // scrape sites
     coingeckoScrape();
     coinmarketcapScrape();
+
 }
 
-// scrape every 10 minutes
-setInterval(() => {
-    if (loadCoins()) {
-        coingeckoScrape();
-        coinmarketcapScrape();
+
+discord.on("ready", () => {
+
+    // load saved coins 
+    if (!loadCoins()) {
+        log("coins.txt failed to load", true)
+        return;
     }
-}, 600000);
+
+    // start first scrape
+    log("starting");
+    scrape();
+
+    // scrape every 10 minutes
+    setInterval(() => {
+        if (loadCoins()) {
+            scrape();
+        }
+    }, 600000);
+
+})
