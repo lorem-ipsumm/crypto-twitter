@@ -41,6 +41,8 @@ var fs = require("fs");
 var Twitter = require("twitter-lite");
 var hooman = require('hooman');
 var CoinCodex = require('coincodex-api');
+var Discord = require('discord.js');
+var discord = new Discord.Client();
 // create CoinCodex API client
 var codex = new CoinCodex();
 // provide your own config with keys
@@ -56,9 +58,24 @@ var client = new Twitter({
     access_token_key: Config.access_token_key,
     access_token_secret: Config.access_token_secret
 });
+// login to discord
+discord.login(Config.discord_token);
 // variable to hold coins.txt data
 // TODO: convert to JSON / easier to parse format
 var coins = "";
+// log output and error message in a discord server
+function log(message, err) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            // mention me if there is an error
+            if (err)
+                discord.channels.cache.get(Config.discord_channel).send("<@" + Config.discord_mention + ">\n" + message);
+            else
+                discord.channels.cache.get(Config.discord_channel).send(message);
+            return [2 /*return*/];
+        });
+    });
+}
 // make a new tweet
 function newTweet(coinData) {
     return __awaiter(this, void 0, void 0, function () {
@@ -71,20 +88,18 @@ function newTweet(coinData) {
                 "\n#crypto #gem #eth #defi" +
                 "\n\n" + coinData.url;
             /*
-// post the tweet
-await client.post("statuses/update", {
-    status: tweet
-})
-.then(() => {
-    console.log(new Date().toJSON());
-    console.log("tweet sent: \n" + tweet);
-})
-.catch((err: any) => {
-    console.log(new Date().toJSON());
-    console.log(err);
-})
-*/
-            console.log(tweet);
+            // post the tweet
+            await client.post("statuses/update", {
+                status: tweet
+            })
+            .then(() => {
+                log("tweet sent: \n" + tweet);
+            })
+            .catch((err: any) => {
+                log(err, true);
+            })
+            */
+            log(tweet);
             return [2 /*return*/];
         });
     });
@@ -98,7 +113,7 @@ function loadCoins() {
             }
             catch (err) {
                 coins = "";
-                console.log(err);
+                log(err, true);
             }
             return [2 /*return*/, coins.length > 0];
         });
@@ -114,12 +129,11 @@ function saveCoins(coinData) {
                     // sleep after finding new coins
                     // this is for if the bot breaks and misses coins
                     // await sleep(1000);
-                    console.log(new Date().toJSON());
-                    console.log("New coin found: " + coinData.name + " / $" + coinData.ticker);
+                    log("New coin found: " + coinData.name + " / $" + coinData.ticker);
                     // append coin name to text file
                     return [4 /*yield*/, fs.appendFile("coins.txt", "\n" + coinData.name + "(" + coinData.ticker + "): " + coinData.site, function (err) {
                             if (err)
-                                console.log(err);
+                                log(err.message, true);
                         })];
                 case 1:
                     // append coin name to text file
@@ -139,6 +153,7 @@ function coinmarketcapScrape() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
+                    log("scraping CoinMarketCap");
                     html = "";
                     _a.label = 1;
                 case 1:
@@ -150,7 +165,7 @@ function coinmarketcapScrape() {
                     return [3 /*break*/, 4];
                 case 3:
                     err_1 = _a.sent();
-                    console.log(err_1);
+                    log(err_1, true);
                     return [2 /*return*/];
                 case 4: return [4 /*yield*/, cheerio.load(html)];
                 case 5:
@@ -190,8 +205,7 @@ function coingeckoScrape() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    console.log(new Date().toJSON());
-                    console.log("scraping");
+                    log("scraping CoinGecko");
                     html = "";
                     _a.label = 1;
                 case 1:
@@ -203,7 +217,7 @@ function coingeckoScrape() {
                     return [3 /*break*/, 4];
                 case 3:
                     err_2 = _a.sent();
-                    console.log(err_2);
+                    log(err_2, true);
                     return [2 /*return*/];
                 case 4: return [4 /*yield*/, cheerio.load(html)];
                 case 5:
@@ -266,7 +280,7 @@ function scrape360() {
                     return [3 /*break*/, 3];
                 case 2:
                     err_3 = _a.sent();
-                    console.log(err_3);
+                    log(err_3, true);
                     return [2 /*return*/];
                 case 3:
                     // exit if no html
@@ -289,16 +303,25 @@ function scrape360() {
         });
     });
 }
-console.log("starting!");
-// load coins.txt before scraping
-if (loadCoins()) {
+// start scraping process
+function scrape() {
+    // scrape sites
     coingeckoScrape();
     coinmarketcapScrape();
 }
-// scrape every 10 minutes
-setInterval(function () {
-    if (loadCoins()) {
-        coingeckoScrape();
-        coinmarketcapScrape();
+discord.on("ready", function () {
+    // load saved coins 
+    if (!loadCoins()) {
+        log("coins.txt failed to load", true);
+        return;
     }
-}, 600000);
+    // start first scrape
+    log("starting");
+    scrape();
+    // scrape every 10 minutes
+    setInterval(function () {
+        if (loadCoins()) {
+            scrape();
+        }
+    }, 600000);
+});

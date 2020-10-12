@@ -63,7 +63,6 @@ async function newTweet(coinData: CoinData) {
                 "\n#crypto #gem #eth #defi" + 
                 "\n\n" + coinData.url;
 
-    /*
     // post the tweet
     await client.post("statuses/update", {
         status: tweet
@@ -74,8 +73,6 @@ async function newTweet(coinData: CoinData) {
     .catch((err: any) => {
         log(err, true);
     })
-    */
-   log(tweet);
 
 }
 
