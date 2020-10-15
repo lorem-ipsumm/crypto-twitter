@@ -1,0 +1,201 @@
+
+Dai If Trump Wins The 2020 Election(YESTRUMP): CoinGecko
+BonezYard(BNZ): CoinGecko
+TKN Token(TKNT): CoinGecko
+SWAG Finance(SWAG): CoinGecko
+Behodler(EYE): CoinGecko
+Digital Reserve Currency(DRC): CoinGecko
+Cross Finance(CRP): CoinGecko
+Richway.Finance(RICH): CoinGecko
+Smartway.Finance(SMART): CoinGecko
+Generation of Yield(YGY): CoinGecko
+Azzure(AZZR): CoinGecko
+Zenfuse(ZEFU): CoinGecko
+PlotX(PLOT): CoinGecko
+LunesXAG(LXAG): CoinGecko
+MoonTools(MOONS): CoinGecko
+Global Gaming(GMNG): CoinGecko
+Yearn Finance DOT(YFDOT): CoinGecko
+Sergey Save Link(SSL): CoinGecko
+Payship(PSHP): CoinGecko
+BSCswap(BSWAP): CoinGecko
+Thugs Finance(THUGS): CoinGecko
+DAOFi(DAOFI): CoinGecko
+Animal Friends United(AFU): CoinGecko
+TON Crystal(TON): CoinGecko
+ACoconut(AC): CoinGecko
+CoFiX(COFI): CoinGecko
+DeFiner(FIN): CoinGecko
+Nobrainer Finance(BRAIN): CoinGecko
+1irstGold(1GOLD): CoinGecko
+deCraft Finance(CRAFT): CoinGecko
+Bfine(BRI): CoinGecko
+ASTR Coin(ASTR): CoinGecko
+Star Pacific Coin(SPC): CoinGecko
+MILK2(MILK2): CoinGecko
+Talent Token(TTX): CoinGecko
+Mimidi(MMD): CoinGecko
+Wolfage Finance Governance Token(WEFI): CoinGecko
+Zukacoin(ZUKA): CoinGecko
+Non-Fungible Yearn(NFY): CoinGecko
+SHAKE(SHAKE): CoinGecko
+Dandy Dego(DANDY): CoinGecko
+Dogeswap(DOGES): CoinGecko
+Seal Finance(SEAL): CoinGecko
+Juggernaut(JGN): CoinGecko
+LimitSwap(LIMIT): CoinGecko
+Doki Doki Finance(DOKI): CoinGecko
+Dracula Token(DRC): CoinGecko
+Alpha Finance(ALPHA): CoinGecko
+BitTiger(BTTR): CoinGecko
+Ivy Mining(IVY): CoinGecko
+Stabilize(STBZ): CoinGecko
+NovaDeFi(NMT): CoinGecko
+pulltherug.finance(RUGZ): CoinGecko
+Power Index Pool Token(PIPT): CoinGecko
+Holyheld(HOLY): CoinGecko
+Snowswap(SNOW): CoinGecko
+Centaur(CNTR): CoinGecko
+Decore(DCORE): CoinGecko
+Yearn-finance Infrastructure Labs(YLAB): CoinGecko
+EasyFi(EASY): CoinGecko
+fry.world(FRIES): CoinGecko
+Heavens Gate(HATE): CoinGecko
+YFED.Finance(YFED): CoinGecko
+Jiviz(JVZ): CoinGecko
+Wrapped Origin Axie(WOA): CoinGecko
+PieDAO DEFI Large Cap(DEFI+L): CoinGecko
+Mettalex(MTLX): CoinGecko
+Index Cooperative(INDEX): CoinGecko
+Thirm Protocol(THIRM): CoinGecko
+FUD.finance(FUD): CoinGecko
+Treep Token(TREEP): CoinGecko
+TrueCAD(TCAD): CoinGecko
+Web Coin Pay(WEC): CoinGecko
+TrueGBP(TGBP): CoinGecko
+Yfscience(YFSI): CoinGecko
+EnCore(ENCORE): CoinGecko
+OWL Token(OWL): CoinGecko
+HitHot(HITHOT): CoinGecko
+Hathor(HTR): CoinGecko
+LYNC Network(LYNC): CoinGecko
+Dark.Build(DARK): CoinGecko
+ArgenPeso(ARGP): CoinGecko
+BitZyon(ZYON): CoinGecko
+DeXe(DEXE): CoinGecko
+YFPRO Finance(YFPRO): CoinGecko
+Vipo VPS(VPS): CoinGecko
+Novo(NOVO): CoinGecko
+Polyient Games Governance Token(PGT): CoinGecko
+YFOS.finance(YFOS): CoinGecko
+YI12 STFinance(YI12): CoinGecko
+Zero Utility Token(ZUT): CoinGecko
+YeaFinance(YEA): CoinGecko
+Beefy.Finance(BIFI): CoinGecko
+TronX coin(TRONX): CoinGecko
+PieDAO DEFI Small Cap(DEFI+S): CoinGecko
+xSNXa(XSNXA): CoinGecko
+YFOX Finance(YFOX): CoinGecko
+Onigiri(ONIGIRI): CoinGecko
+Cyclops Treasure(CYTR): CoinGecko
+Bellevue Network(BLV): CoinGecko
+Tavittcoin(TAVITT): CoinMarketCap
+Global Gaming(GMNG): CoinMarketCap
+Value DeFi Protocol(VALUE): CoinMarketCap
+MoonTools(MOONS): CoinMarketCap
+Payship(PSHP): CoinMarketCap
+Sergey Save Link(SSL): CoinMarketCap
+Yearn Finance DOT(YFDOT): CoinMarketCap
+CoFiX(COFI): CoinMarketCap
+ACoconut(AC): CoinMarketCap
+Bfine(BRI): CoinMarketCap
+deCraft Finance(CRAFT): CoinMarketCap
+Spaceswap(MILK2): CoinMarketCap
+Nobrainer Finance(BRAIN): CoinMarketCap
+Non-Fungible Yearn(NFY): CoinMarketCap
+SHAKE(SHAKE): CoinMarketCap
+SUP(SUP): CoinMarketCap
+Doki Doki Finance(DOKI): CoinMarketCap
+Seal Finance(SEAL): CoinMarketCap
+LimitSwap(LIMIT): CoinMarketCap
+POP Network Token(POP): CoinMarketCap
+TopCoinFX(TCFX): CoinMarketCap
+Stabilize(STBZ): CoinMarketCap
+NovaDeFi(NMT): CoinMarketCap
+Holyheld(HOLY): CoinMarketCap
+BitTiger(BTTR): CoinMarketCap
+Centaur(CNTR): CoinMarketCap
+Thirm Protocol(THRM): CoinMarketCap
+Yearn-finance Infrastructure Labs(YLAB): CoinMarketCap
+YFED.Finance(YFED): CoinMarketCap
+Fridn(EFAR): CoinMarketCap
+FUD.finance(FUD): CoinMarketCap
+Index Cooperative(INDEX): CoinMarketCap
+Wrapped Origin Axie(WOA): CoinMarketCap
+Yfscience(YFSI): CoinMarketCap
+QOOBER(QOOB): CoinMarketCap
+Dark.Build(DARK): CoinMarketCap
+DeXe(DEXE): CoinMarketCap
+LYNC Network(LYNC): CoinMarketCap
+OWL Token (StealthSwap)(OWL): CoinMarketCap
+YFPRO Finance(YFPRO): CoinMarketCap
+EasyFi(EASY): CoinMarketCap
+DeFi Insurance Protocol(DFIP): CoinMarketCap
+Gem Exchange And Trading(GXT): CoinMarketCap
+Beefy.Finance(BIFI): CoinMarketCap
+Novo(NOVO): CoinMarketCap
+OnigiriSwap(ONIGIRI): CoinMarketCap
+PieDAO DEFI Small Cap(DEFI+S): CoinMarketCap
+Polyient Games Governance Token(PGT): CoinMarketCap
+YeaFinance(YEA): CoinMarketCap
+Zero Utility Token(ZUT): CoinMarketCap
+YFOS.finance(YFOS): CoinMarketCap
+Neutrino System Base Token(NSBT): CoinMarketCap
+YOUengine(YOUC): CoinMarketCap
+happy birthday coin(HBDC): CoinMarketCap
+Starname(IOV): CoinMarketCap
+YFOX FINANCE(YFOX): CoinMarketCap
+Venus(XVS): CoinMarketCap
+YFMoonBeam(YFMB): CoinMarketCap
+Yearn4 Finance(YF4): CoinMarketCap
+Phantasma Energy(KCAL): CoinMarketCap
+ErcauX(RAUX): CoinMarketCap
+AurusCOIN(AWX): CoinMarketCap
+ZAC Finance(ZAC): CoinMarketCap
+Smol(SMOL): CoinMarketCap
+Cyclops Treasure(CYTR): CoinMarketCap
+Bellevue Network(BLV): CoinMarketCap
+Anatha(wANATHA): CoinMarketCap
+PieDAO DOUGH v2(DOUGH): CoinMarketCap
+BigdataCash(BDCASH): CoinMarketCap
+Aave(AAVE): CoinMarketCap
+Aitra(AITRA): CoinMarketCap
+APEcoin(APE): CoinMarketCap
+Epic(EPIC): CoinMarketCap
+Kompass(KOMP): CoinMarketCap
+Steaks Finance(STEAK): CoinMarketCap
+Pajama.Finance(PJM): CoinMarketCap
+SAFE DEAL(SFD): CoinMarketCap
+Yearn Finance Ecosystem(YFIEC): CoinMarketCap
+AmericanHorror.Finance(AHF): CoinMarketCap
+cVault.finance(CORE): CoinMarketCap
+QChi Chain(QHC): CoinMarketCap
+SaTT(SATT): CoinMarketCap
+Stobox Token(STBU): CoinMarketCap
+Tamy Token(TMT): CoinMarketCap
+Timers(IPM): CoinMarketCap
+Yearn Finance Passive Income(YFPI): CoinMarketCap
+YFE Money(YFE): CoinMarketCap
+YieldWars(WAR): CoinMarketCap
+Yoink(YNK): CoinMarketCap
+Metric(METRIC): CoinMarketCap
+Mettalex(MTLX): CoinMarketCap
+Vampire Protocol(VAMP): CoinMarketCap
+Wrapped LEO(WLEO): CoinMarketCap
+yAxis(YAX): CoinMarketCap
+DeFiner(FIN): CoinMarketCap
+Alpha Finance Lab(ALPHA): CoinMarketCap
+Yearn Land(YLAND): CoinMarketCap
+Trading Membership Community(TMC): CoinMarketCap
+Celo Dollar(CUSD): CoinMarketCap
+Yearn Finance Bit(YFBT): CoinMarketCap
