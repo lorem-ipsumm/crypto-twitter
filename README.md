@@ -5,6 +5,10 @@ This is a bot that scrapes CoinGecko and CoinMarketCap and makes a tweet wheneve
 
 Feel free to make a pull request if you want to implement a useful feature. You'll have to hook it up to your API keys first though.
 
+# 10/12/20
+ - Added #crypto #defi #eth hashtags to reach more people
+ - Removed axios and I switched to [hooman](https://github.com/sayem314/hooman)
+
 # 9/21/20:
  - Added CoinMarketCap scraping! Now the bot will tweet out new coins from both CoinGecko and CoinMarketCap
  - Removed price % change. Most of the new coins that are added have no data on them when the bot finds them, so having data on how much the price has changed in the last hour/day was worthless.
