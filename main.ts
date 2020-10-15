@@ -281,11 +281,11 @@ discord.on("ready", () => {
     log("starting");
     scrape();
 
-    // scrape every 10 minutes
+    // scrape every 15 minutes
     setInterval(() => {
         if (loadCoins()) {
             scrape();
         }
-    }, 600000);
+    }, 900000);
 
 })
