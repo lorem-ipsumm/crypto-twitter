@@ -107,7 +107,7 @@ async function saveCoins(coinData: CoinData) {
             if (err) log(err.message,true);
         });
 
-        // newTweet(coinData);
+        newTweet(coinData);
 
     }
 
