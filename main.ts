@@ -68,7 +68,7 @@ async function newTweet(coinData: CoinData) {
         status: tweet
     })
     .then(() => {
-        log("tweet sent: \n" + tweet);
+        log("tweet sent: \n```" + tweet + "```");
     })
     .catch((err: any) => {
         log(err, true);
@@ -99,8 +99,7 @@ async function saveCoins(coinData: CoinData) {
         // this is for if the bot breaks and misses coins
         // await sleep(1000);
 
-        log("New coin found: ```" + coinData.name + " / $" + coinData.ticker + "```");
-
+        log("New " + coinData.site + " coin found: " + coinData.name + " / $" + coinData.ticker);
 
         // append coin name to text file
         await fs.appendFile("coins.txt", "\n" + coinData.name+ "(" + coinData.ticker + "): " + coinData.site, (err) => {
@@ -117,7 +116,7 @@ async function saveCoins(coinData: CoinData) {
 // scrape coinmarketcap
 async function coinmarketcapScrape() {
 
-    log("scraping CoinMarketCap");
+    // log("scraping CoinMarketCap");
 
     // try and read coins.txt and make get request
     let html = "";
