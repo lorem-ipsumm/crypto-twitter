@@ -99,7 +99,7 @@ async function saveCoins(coinData: CoinData) {
         // this is for if the bot breaks and misses coins
         // await sleep(1000);
 
-        log("New coin found: " + coinData.name + " / $" + coinData.ticker);
+        log("New coin found: ```" + coinData.name + " / $" + coinData.ticker + "```");
 
 
         // append coin name to text file
