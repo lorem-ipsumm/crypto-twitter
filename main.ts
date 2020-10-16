@@ -166,7 +166,7 @@ async function coinmarketcapScrape() {
 // scrape the recently added page
 async function coingeckoScrape() {
 
-    log("scraping CoinGecko");
+    // log("scraping CoinGecko");
 
     let html = "";
 
