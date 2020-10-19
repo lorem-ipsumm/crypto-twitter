@@ -68,7 +68,12 @@ async function newTweet(coinData: CoinData) {
         status: tweet
     })
     .then(() => {
-        log("tweet sent: \n```" + tweet + "```");
+        log("```New " + coinData.site + " Listing!\n\n" + 
+                coinData.name + " / $" + coinData.ticker +
+                "\nPrice: " + coinData.price + 
+                "\n24h Volume: " + coinData.volume + 
+                "```\n" + coinData.url
+        );
     })
     .catch((err: any) => {
         log(err, true);
