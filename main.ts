@@ -1,5 +1,6 @@
 import * as cheerio from 'cheerio';
 import * as fs from 'fs';
+import * as twitterStream from './stream';
 const Twitter = require("twitter-lite");
 const hooman = require('hooman');
 const CoinCodex = require('coincodex-api');
@@ -17,6 +18,9 @@ const Config = require("./config");
 // setup client
 // comment this section out if you don't have keys and
 // and you just want to scrape Coingecko
+
+
+
 const client = new Twitter({
     consumer_key: Config.consumer_key,
     consumer_secret: Config.consumer_secret,
@@ -24,8 +28,28 @@ const client = new Twitter({
     access_token_secret: Config.access_token_secret
 });
 
+/*
+client.get("account/verify_credentials")
+.then(async (res: any) => {
+
+    const rateLimits = await client.get("statuses/lookup", {
+        id: "1016078154497048576",
+        tweet_mode: "extended"
+    });
+
+    console.log(rateLimits);
+
+
+})
+.catch((err: any) => {
+    console.log("err");
+})
+
+t();
+*/
+
 // login to discord
-discord.login(Config.discord_token);
+discord.login(Config.DISCORD_TOKEN);
 
 // variable to hold coins.txt data
 // TODO: convert to JSON / easier to parse format
@@ -42,13 +66,41 @@ interface CoinData {
 
 
 // log output and error message in a discord server
-async function log(message: string, err?: boolean | null) {
-    
-    // mention me if there is an error
-    if (err)
-        discord.channels.cache.get(Config.discord_channel).send("<@" + Config.discord_mention + ">\n" + message);
-    else 
-        discord.channels.cache.get(Config.discord_channel).send(message);
+export async function log(message: string, where: string, err?: boolean | null) {
+
+    let channelId:string;
+
+    if(where === "gems")
+        channelId = Config.DISCORD_CHANNEL_GEMS; 
+    else if (where === "social")
+        channelId = Config.DISCORD_CHANNEL_SOCIAL;
+    else
+        return;
+
+    if (where === "gems") {
+
+        // mention me if there is an error
+        if (err)
+            discord.channels.cache.get(channelId).send("<@" + Config.DISCORD_MENTION + ">\n" + message);
+        else 
+            discord.channels.cache.get(channelId).send(message);
+
+    } else if (where === "social") {
+
+        // get the channel
+        const channel = await discord.channels.cache.get(channelId);
+
+        if (!channel)
+            return;
+
+        // edit message to show new data
+        channel.messages.fetch(Config.DISCORD_EDIT)
+        .then((m: any) => {
+            m.edit(message)
+        });
+
+
+    }
 
 }
 
@@ -73,10 +125,10 @@ async function newTweet(coinData: CoinData) {
                 "\nPrice: " + coinData.price + 
                 "\n24h Volume: " + coinData.volume + 
                 "```\n" + coinData.url
-        );
+        , "gems");
     })
     .catch((err: any) => {
-        log(err, true);
+        log(err, "gems", true);
     })
 
 }
@@ -88,7 +140,7 @@ async function loadCoins() {
         coins = fs.readFileSync("coins.txt", "utf8");
     } catch(err) {
         coins = "";
-        log(err,true);
+        log(err, "gems", true);
     }
 
     return coins.length > 0;
@@ -104,14 +156,14 @@ async function saveCoins(coinData: CoinData) {
         // this is for if the bot breaks and misses coins
         // await sleep(1000);
 
-        log("New " + coinData.site + " coin found: " + coinData.name + " / $" + coinData.ticker);
+        log("New " + coinData.site + " coin found: " + coinData.name + " / $" + coinData.ticker, "gems");
 
         // append coin name to text file
         await fs.appendFile("coins.txt", "\n" + coinData.name+ "(" + coinData.ticker + "): " + coinData.site, (err) => {
-            if (err) log(err.message,true);
+            if (err) log(err.message, "gems", true);
         });
 
-        newTweet(coinData);
+        // newTweet(coinData);
 
     }
 
@@ -130,7 +182,7 @@ async function coinmarketcapScrape() {
         const response = await hooman.get('https://coinmarketcap.com/new/');
         html = response.body;
     } catch(err) {
-        log(err, true);
+        log(err, "gems", true);
         return;
     }
 
@@ -179,7 +231,7 @@ async function coingeckoScrape() {
         const response = await hooman.get('https://www.coingecko.com/en/coins/recently_added');
         html = response.body;
     } catch(err) {
-        log(err, true);
+        log(err, "gems", true);
         return;
     }
 
@@ -237,7 +289,7 @@ async function scrape360() {
         const response = await hooman.get('https://api.coin360.com/coin/latest');
         html = JSON.parse(response.body);
     } catch(err) {
-        log(err, true);
+        log(err, "gems", true);
         return;
     }
 
@@ -272,17 +324,19 @@ function scrape() {
 
 }
 
+discord.on("ready", async () => {
 
-discord.on("ready", () => {
+    // start streaming tweets
+    twitterStream.start();
 
     // load saved coins 
     if (!loadCoins()) {
-        log("coins.txt failed to load", true)
+        log("coins.txt failed to load", "gems", true)
         return;
     }
 
     // start first scrape
-    log("starting");
+    log("starting", "gems");
     scrape();
 
     // scrape every 15 minutes

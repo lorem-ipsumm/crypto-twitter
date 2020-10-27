@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var cheerio = require("cheerio");
 var fs = require("fs");
+var twitterStream = require("./stream");
 var Twitter = require("twitter-lite");
 var hooman = require('hooman');
 var CoinCodex = require('coincodex-api');
@@ -58,49 +59,100 @@ var client = new Twitter({
     access_token_key: Config.access_token_key,
     access_token_secret: Config.access_token_secret
 });
+/*
+client.get("account/verify_credentials")
+.then(async (res: any) => {
+
+    const rateLimits = await client.get("statuses/lookup", {
+        id: "1016078154497048576",
+        tweet_mode: "extended"
+    });
+
+    console.log(rateLimits);
+
+
+})
+.catch((err: any) => {
+    console.log("err");
+})
+
+t();
+*/
 // login to discord
-discord.login(Config.discord_token);
+discord.login(Config.DISCORD_TOKEN);
 // variable to hold coins.txt data
 // TODO: convert to JSON / easier to parse format
 var coins = "";
 // log output and error message in a discord server
-function log(message, err) {
+function log(message, where, err) {
     return __awaiter(this, void 0, void 0, function () {
+        var channelId, channel;
         return __generator(this, function (_a) {
-            // mention me if there is an error
-            if (err)
-                discord.channels.cache.get(Config.discord_channel).send("<@" + Config.discord_mention + ">\n" + message);
-            else
-                discord.channels.cache.get(Config.discord_channel).send(message);
-            return [2 /*return*/];
+            switch (_a.label) {
+                case 0:
+                    if (where === "gems")
+                        channelId = Config.DISCORD_CHANNEL_GEMS;
+                    else if (where === "social")
+                        channelId = Config.DISCORD_CHANNEL_SOCIAL;
+                    else
+                        return [2 /*return*/];
+                    if (!(where === "gems")) return [3 /*break*/, 1];
+                    // mention me if there is an error
+                    if (err)
+                        discord.channels.cache.get(channelId).send("<@" + Config.DISCORD_MENTION + ">\n" + message);
+                    else
+                        discord.channels.cache.get(channelId).send(message);
+                    return [3 /*break*/, 3];
+                case 1:
+                    if (!(where === "social")) return [3 /*break*/, 3];
+                    return [4 /*yield*/, discord.channels.cache.get(channelId)];
+                case 2:
+                    channel = _a.sent();
+                    if (!channel)
+                        return [2 /*return*/];
+                    // edit message to show new data
+                    channel.messages.fetch(Config.DISCORD_EDIT)
+                        .then(function (m) {
+                        m.edit(message);
+                    });
+                    _a.label = 3;
+                case 3: return [2 /*return*/];
+            }
         });
     });
 }
+exports.log = log;
 // make a new tweet
 function newTweet(coinData) {
     return __awaiter(this, void 0, void 0, function () {
         var tweet;
         return __generator(this, function (_a) {
-            tweet = "New " + coinData.site + " Listing!\n\n" +
-                coinData.name + " / $" + coinData.ticker +
-                "\nPrice: " + coinData.price +
-                "\n24h Volume: " + coinData.volume +
-                "\n#crypto #gem #eth #defi" +
-                "\n\n" + coinData.url;
-            /*
-            // post the tweet
-            await client.post("statuses/update", {
-                status: tweet
-            })
-            .then(() => {
-                log("tweet sent: \n" + tweet);
-            })
-            .catch((err: any) => {
-                log(err, true);
-            })
-            */
-            log(tweet);
-            return [2 /*return*/];
+            switch (_a.label) {
+                case 0:
+                    tweet = "New " + coinData.site + " Listing!\n\n" +
+                        coinData.name + " / $" + coinData.ticker +
+                        "\nPrice: " + coinData.price +
+                        "\n24h Volume: " + coinData.volume +
+                        "\n#crypto #gem #eth #defi" +
+                        "\n\n" + coinData.url;
+                    // post the tweet
+                    return [4 /*yield*/, client.post("statuses/update", {
+                            status: tweet
+                        })
+                            .then(function () {
+                            log("```New " + coinData.site + " Listing!\n\n" +
+                                coinData.name + " / $" + coinData.ticker +
+                                "\nPrice: " + coinData.price +
+                                "\n24h Volume: " + coinData.volume +
+                                "```\n" + coinData.url, "gems");
+                        })["catch"](function (err) {
+                            log(err, "gems", true);
+                        })];
+                case 1:
+                    // post the tweet
+                    _a.sent();
+                    return [2 /*return*/];
+            }
         });
     });
 }
@@ -113,7 +165,7 @@ function loadCoins() {
             }
             catch (err) {
                 coins = "";
-                log(err, true);
+                log(err, "gems", true);
             }
             return [2 /*return*/, coins.length > 0];
         });
@@ -129,16 +181,15 @@ function saveCoins(coinData) {
                     // sleep after finding new coins
                     // this is for if the bot breaks and misses coins
                     // await sleep(1000);
-                    log("New coin found: " + coinData.name + " / $" + coinData.ticker);
+                    log("New " + coinData.site + " coin found: " + coinData.name + " / $" + coinData.ticker, "gems");
                     // append coin name to text file
                     return [4 /*yield*/, fs.appendFile("coins.txt", "\n" + coinData.name + "(" + coinData.ticker + "): " + coinData.site, function (err) {
                             if (err)
-                                log(err.message, true);
+                                log(err.message, "gems", true);
                         })];
                 case 1:
                     // append coin name to text file
                     _a.sent();
-                    newTweet(coinData);
                     _a.label = 2;
                 case 2: return [2 /*return*/];
             }
@@ -153,7 +204,6 @@ function coinmarketcapScrape() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    log("scraping CoinMarketCap");
                     html = "";
                     _a.label = 1;
                 case 1:
@@ -165,7 +215,7 @@ function coinmarketcapScrape() {
                     return [3 /*break*/, 4];
                 case 3:
                     err_1 = _a.sent();
-                    log(err_1, true);
+                    log(err_1, "gems", true);
                     return [2 /*return*/];
                 case 4: return [4 /*yield*/, cheerio.load(html)];
                 case 5:
@@ -205,7 +255,6 @@ function coingeckoScrape() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    log("scraping CoinGecko");
                     html = "";
                     _a.label = 1;
                 case 1:
@@ -217,7 +266,7 @@ function coingeckoScrape() {
                     return [3 /*break*/, 4];
                 case 3:
                     err_2 = _a.sent();
-                    log(err_2, true);
+                    log(err_2, "gems", true);
                     return [2 /*return*/];
                 case 4: return [4 /*yield*/, cheerio.load(html)];
                 case 5:
@@ -280,7 +329,7 @@ function scrape360() {
                     return [3 /*break*/, 3];
                 case 2:
                     err_3 = _a.sent();
-                    log(err_3, true);
+                    log(err_3, "gems", true);
                     return [2 /*return*/];
                 case 3:
                     // exit if no html
@@ -309,19 +358,24 @@ function scrape() {
     coingeckoScrape();
     coinmarketcapScrape();
 }
-discord.on("ready", function () {
-    // load saved coins 
-    if (!loadCoins()) {
-        log("coins.txt failed to load", true);
-        return;
-    }
-    // start first scrape
-    log("starting");
-    scrape();
-    // scrape every 10 minutes
-    setInterval(function () {
-        if (loadCoins()) {
-            scrape();
+discord.on("ready", function () { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        // start streaming tweets
+        twitterStream.start();
+        // load saved coins 
+        if (!loadCoins()) {
+            log("coins.txt failed to load", "gems", true);
+            return [2 /*return*/];
         }
-    }, 600000);
-});
+        // start first scrape
+        log("starting", "gems");
+        scrape();
+        // scrape every 15 minutes
+        setInterval(function () {
+            if (loadCoins()) {
+                scrape();
+            }
+        }, 900000);
+        return [2 /*return*/];
+    });
+}); });
