@@ -163,7 +163,7 @@ async function saveCoins(coinData: CoinData) {
             if (err) log(err.message, "gems", true);
         });
 
-        // newTweet(coinData);
+        newTweet(coinData);
 
     }
 
