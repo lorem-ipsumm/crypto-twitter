@@ -25,6 +25,14 @@ interface ListItem {
     change: string
 }
 
+// TODO actually use these interfaces
+interface FrequencyList {
+    sorted(): void;
+    add(ticker: any): void;
+    clear(): void;
+    toString(): string;
+}
+
 // old list of 
 // let oldList:string[] = [];
 
@@ -98,7 +106,7 @@ let frequencyList:any= {
     sorted: (() => {
 
         // javascript meme magic
-        const sorted = Object.entries(frequencyList).slice(3)
+        const sorted = Object.entries(frequencyList).slice(4)
         .sort((a: any, b: any) => {
             return(b[1].count - a[1].count);
         })
@@ -111,10 +119,27 @@ let frequencyList:any= {
 
     }),
 
+    clear: (() => {
+
+        // remove everything but methods
+        const sorted = Object.entries(frequencyList).slice(0,4)
+        .sort((a: any, b: any) => {
+            return(b[1].count - a[1].count);
+        })
+        // ???
+        .reduce((r, [k, v]) => ({
+                ...r, [k]: v 
+        }), {});
+
+        // update list
+        frequencyList = sorted;
+
+    }),
+
     toString: (() => {
 
         // sort items and only keep top 25
-        const sorted = Object.entries(frequencyList).slice(3)
+        const sorted = Object.entries(frequencyList).slice(4)
         .sort((a: any, b: any) => {
             return(b[1].count - a[1].count);
         });
@@ -292,7 +317,7 @@ export async function start() {
     running = true;
 
     // reset frequency list
-    frequencyList = {};
+    frequencyList.clear();
 
     while(true && !restarting) {
 
