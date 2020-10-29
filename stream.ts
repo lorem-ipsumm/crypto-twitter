@@ -298,7 +298,7 @@ export async function start() {
 
 
         let timestamp = "[" + startTime + " - " + new Date().toLocaleString() + "]" + 
-        "\n\n25 Trending Coins On Twitter: \n\n";
+        "\n\n25 Trending Coins On Twitter (" + Object.keys(frequencyList.sorted()).length + " tickers scanned): \n\n";
 
         // don't post duplicates
         if (frequencyList.toString() !== lastMessage)
