@@ -256,6 +256,7 @@ export async function restart() {
         if (stream)
             stream.close();
 
+
         // alert the masses
         main.log("```...waiting for old stream to close...```", "social");
 
@@ -289,6 +290,9 @@ export async function start() {
 
     // set running flag
     running = true;
+
+    // reset frequency list
+    frequencyList = {};
 
     while(true && !restarting) {
 
