@@ -305,7 +305,7 @@ export async function start() {
             main.log(
                 "```" + 
                 timestamp +
-                frequencyList.toString().slice(0, 25) + 
+                frequencyList.toString().split("\n").slice(0, 25).join("\n") + 
                 "\n\nRecently Scanned: \n\n" + 
                 recentlyScanned.join(' ') +  
                 "\n```" + 
