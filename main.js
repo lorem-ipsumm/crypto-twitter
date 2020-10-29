@@ -190,6 +190,7 @@ function saveCoins(coinData) {
                 case 1:
                     // append coin name to text file
                     _a.sent();
+                    newTweet(coinData);
                     _a.label = 2;
                 case 2: return [2 /*return*/];
             }
@@ -358,24 +359,29 @@ function scrape() {
     coingeckoScrape();
     coinmarketcapScrape();
 }
+// wait for discord to be ready
 discord.on("ready", function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        // start streaming tweets
-        twitterStream.start();
-        // load saved coins 
-        if (!loadCoins()) {
-            log("coins.txt failed to load", "gems", true);
-            return [2 /*return*/];
-        }
-        // start first scrape
-        log("starting", "gems");
-        scrape();
-        // scrape every 15 minutes
-        setInterval(function () {
-            if (loadCoins()) {
-                scrape();
+        // listen for messages
+        discord.on("message", function (message) {
+            // is this in the social channel?
+            if (message.channel.id !== Config.DISCORD_CHANNEL_SOCIAL)
+                return;
+            // restart streaming
+            twitterStream.restart();
+            if (message) {
+                try {
+                    message["delete"]({ timeout: 500 });
+                }
+                catch (e) {
+                    console.log("whoop");
+                    console.log(e);
+                }
             }
-        }, 900000);
+        });
+        // start streaming tweets
+        // twitterStream.start();
+        setInterval(function () { }, 5000);
         return [2 /*return*/];
     });
 }); });

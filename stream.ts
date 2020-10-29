@@ -166,6 +166,7 @@ async function newStream(trackingList: string[]) {
     });
     stream.on("connection aborted", () => {
         console.log("connection closed");
+        stream = null;
     });
     
     // wait until stream is setup before returning
@@ -233,14 +234,52 @@ async function parseStream(stream: any) {
 
     // erase stream when streaming is over
     while(streaming) await wait(500);
-    console.log("done streaming");
+        console.log("done streaming");
+
+}
+
+// operation(?) variables (kinda debounce variables)
+let running: boolean = false;
+let restarting: boolean = false;
+
+// restart streaming immediately 
+export async function restart() {
+
+    console.log("here");
+
+    // set restarting flag
+    restarting = true;
+
+    try{
+
+        // close old stream if it exists
+        if (stream)
+            stream.close();
+
+        // alert the masses
+        main.log("```...waiting for old stream to close...```", "social");
+
+        // wait until everything is done
+        while(running) await wait(500);
+
+        console.log("okay done waiting")
+
+        restarting = false;
+
+        // start over
+        start();
+
+    }catch(err){
+        console.log(err)
+    }
+
 
 }
 
 export async function start() { 
 
     // client = twitterClient;
-    main.log("```..restarting scanning..```", "social")
+    main.log("```...waiting for price tickers...```", "social");
 
     // keep track of the previous message sent
     let lastMessage = frequencyList.toString();
@@ -248,7 +287,10 @@ export async function start() {
     // get starting time
     let startTime = new Date().toLocaleString();
 
-    while(true) {
+    // set running flag
+    running = true;
+
+    while(true && !restarting) {
 
         fs.writeFileSync("./frequency.txt", frequencyList.toString(), (err: any) => {
             console.log(err);
@@ -261,12 +303,13 @@ export async function start() {
         // don't post duplicates
         if (frequencyList.toString() !== lastMessage)
             main.log(
-            "```" + 
-            timestamp +
-            frequencyList.toString() + 
-            "\n\nRecently Scanned: \n\n" + 
-            recentlyScanned.join(' ') +  
-            "```", "social");
+                "```" + 
+                timestamp +
+                frequencyList.toString() + 
+                "\n\nRecently Scanned: \n\n" + 
+                recentlyScanned.join(' ') +  
+                "\n```" + 
+                "\nsay 'rs' or 'reset' to refresh (takes 1-2 minutes)", "social");
 
         // update last message
         lastMessage = frequencyList.toString();
@@ -280,6 +323,9 @@ export async function start() {
         await wait(60000);
 
     }
+
+    // unset running flag
+    running = false;
 
 }
 

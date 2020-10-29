@@ -187,6 +187,7 @@ function newStream(trackingList) {
                     });
                     stream.on("connection aborted", function () {
                         console.log("connection closed");
+                        stream = null;
                     });
                     _a.label = 1;
                 case 1:
@@ -260,6 +261,50 @@ function parseStream(stream) {
         });
     });
 }
+// operation(?) variables (kinda debounce variables)
+var running = false;
+var restarting = false;
+// restart streaming immediately 
+function restart() {
+    return __awaiter(this, void 0, void 0, function () {
+        var err_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    console.log("here");
+                    // set restarting flag
+                    restarting = true;
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 5, , 6]);
+                    // close old stream if it exists
+                    if (stream)
+                        stream.close();
+                    // alert the masses
+                    main.log("```...waiting for old stream to close...```", "social");
+                    _a.label = 2;
+                case 2:
+                    if (!running) return [3 /*break*/, 4];
+                    return [4 /*yield*/, wait(500)];
+                case 3:
+                    _a.sent();
+                    return [3 /*break*/, 2];
+                case 4:
+                    console.log("okay done waiting");
+                    restarting = false;
+                    // start over
+                    start();
+                    return [3 /*break*/, 6];
+                case 5:
+                    err_1 = _a.sent();
+                    console.log(err_1);
+                    return [3 /*break*/, 6];
+                case 6: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.restart = restart;
 function start() {
     return __awaiter(this, void 0, void 0, function () {
         var lastMessage, startTime, timestamp, stream_1;
@@ -267,12 +312,14 @@ function start() {
             switch (_a.label) {
                 case 0:
                     // client = twitterClient;
-                    main.log("```..restarting scanning..```", "social");
+                    main.log("```...waiting for price tickers...```", "social");
                     lastMessage = frequencyList.toString();
                     startTime = new Date().toLocaleString();
+                    // set running flag
+                    running = true;
                     _a.label = 1;
                 case 1:
-                    if (!true) return [3 /*break*/, 4];
+                    if (!(true && !restarting)) return [3 /*break*/, 4];
                     fs.writeFileSync("./frequency.txt", frequencyList.toString(), function (err) {
                         console.log(err);
                     });
@@ -285,7 +332,8 @@ function start() {
                             frequencyList.toString() +
                             "\n\nRecently Scanned: \n\n" +
                             recentlyScanned.join(' ') +
-                            "```", "social");
+                            "\n```" +
+                            "\nsay 'rs' or 'reset' to restart (takes 1-2 minutes)", "social");
                     // update last message
                     lastMessage = frequencyList.toString();
                     return [4 /*yield*/, newStream(filterListDext)];
@@ -297,7 +345,10 @@ function start() {
                 case 3:
                     _a.sent();
                     return [3 /*break*/, 1];
-                case 4: return [2 /*return*/];
+                case 4:
+                    // unset running flag
+                    running = false;
+                    return [2 /*return*/];
             }
         });
     });

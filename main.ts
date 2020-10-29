@@ -324,7 +324,29 @@ function scrape() {
 
 }
 
+// wait for discord to be ready
 discord.on("ready", async () => {
+
+    // listen for messages
+    discord.on("message", (message: any) => {
+
+        // is this in the social channel?
+        if (message.channel.id !== Config.DISCORD_CHANNEL_SOCIAL)
+            return;
+
+        // restart streaming
+        twitterStream.restart()
+
+        if (message) {
+            
+            try {
+                message.delete({timeout: 500})
+            } catch (e) {
+                return;
+            }
+        }
+        
+    })
 
     // start streaming tweets
     twitterStream.start();
