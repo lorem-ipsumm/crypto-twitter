@@ -117,7 +117,7 @@ let frequencyList:any= {
         const sorted = Object.entries(frequencyList).slice(3)
         .sort((a: any, b: any) => {
             return(b[1].count - a[1].count);
-        }).slice(0, 25)
+        });
 
         let str = "";
         let item:any;
@@ -282,7 +282,7 @@ export async function start() {
     main.log("```...waiting for price tickers...```", "social");
 
     // keep track of the previous message sent
-    let lastMessage = frequencyList.toString();
+    let lastMessage = frequencyList.toString().slice(0, 25);
 
     // get starting time
     let startTime = new Date().toLocaleString();
@@ -292,27 +292,27 @@ export async function start() {
 
     while(true && !restarting) {
 
-        fs.writeFileSync("./frequency.txt", frequencyList.toString(), (err: any) => {
+        fs.writeFileSync("./frequency.txt", frequencyList.toString().slice(0, 25), (err: any) => {
             console.log(err);
         });
 
 
         let timestamp = "[" + startTime + " - " + new Date().toLocaleString() + "]" + 
-        "\n\n25 Trending Coins On Twitter (" + frequencyList.sorted().length + " tickers scanned): \n\n";
+        "\n\n25 Trending Coins On Twitter (" + frequencyList.toString().split("\n").length + " tickers scanned): \n\n";
 
         // don't post duplicates
         if (frequencyList.toString() !== lastMessage)
             main.log(
                 "```" + 
                 timestamp +
-                frequencyList.toString() + 
+                frequencyList.toString().slice(0, 25) + 
                 "\n\nRecently Scanned: \n\n" + 
                 recentlyScanned.join(' ') +  
                 "\n```" + 
                 "\nsay 'rs' or 'reset' to refresh (takes 1-2 minutes)", "social");
 
         // update last message
-        lastMessage = frequencyList.toString();
+        lastMessage = frequencyList.toString().slice(0, 25);
 
         // get a new stream
         let stream = await newStream(filterListDext);
