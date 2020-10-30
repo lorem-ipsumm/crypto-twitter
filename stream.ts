@@ -207,7 +207,7 @@ async function parseStream(stream: any) {
     console.log("parsing stream");
 
     // regex for detecing tickers ex: $yeld $core $CEL etc.
-    const reg = /\B(\$[a-zA-Z0-9]+\b)(?!;)/gm;
+    const reg = /\B(\$[a-zA-Z][a-zA-Z0-9]+\b)(?!;)/gm;
 
     let streaming = true;
 
