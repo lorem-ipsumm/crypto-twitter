@@ -376,7 +376,7 @@ discord.on("ready", function () { return __awaiter(void 0, void 0, void 0, funct
             var text = message.content;
             // restart streaming and pass in requested tickers
             // if there are at least 3
-            if (text.match(reg).length >= 3)
+            if (text.match(reg) && text.match(reg).length >= 3)
                 twitterStream.restart(text.match(reg));
             else
                 twitterStream.restart();
