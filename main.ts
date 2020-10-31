@@ -107,6 +107,10 @@ export async function log(message: string, where: string, err?: boolean | null) 
 // make a new tweet
 async function newTweet(coinData: CoinData) {
 
+    // don't tweet in dev
+    if (__dirname.indexOf("/home/nick/Documents") !== -1)
+        return;
+
     // build tweet
     let tweet = "New " + coinData.site + " Listing!\n\n" + 
                 coinData.name + " / $" + coinData.ticker +
@@ -163,7 +167,7 @@ async function saveCoins(coinData: CoinData) {
             if (err) log(err.message, "gems", true);
         });
 
-        newTweet(coinData);
+        // newTweet(coinData);
 
     }
 
@@ -327,6 +331,9 @@ function scrape() {
 // wait for discord to be ready
 discord.on("ready", async () => {
 
+    // reg for detecting tickers 
+    const reg = /\B(\$[a-zA-Z][a-zA-Z0-9]+\b)(?!;)/gm;
+
     // listen for messages
     discord.on("message", (message: any) => {
 
@@ -334,8 +341,15 @@ discord.on("ready", async () => {
         if (message.channel.id !== Config.DISCORD_CHANNEL_SOCIAL)
             return;
 
-        // restart streaming
-        twitterStream.restart()
+        // get the message content
+        const text = message.content;
+
+        // restart streaming and pass in requested tickers
+        // if there are at least 3
+        if (text.match(reg).length >= 3)
+            twitterStream.restart(text.match(reg));
+        else 
+            twitterStream.restart();
 
         if (message) {
             

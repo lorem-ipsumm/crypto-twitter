@@ -59,11 +59,7 @@ var conf = {
     token_secret: Config.access_token_secret
 };
 // filter list to be updated
-var filterList = ["$yfi", "$xrp", "$vet", "$icx",
-    "$core", "$uni", "$lido"];
-// list from top dextools list 
-var filterListDext = ["$CORE", "$yfi", "$NBT", "$YRISE", "$PRIA",
-    "$UNI", "$TORE", "$encore", "$ARIA", "$pCore"];
+var filterList;
 // old list of 
 // let oldList:string[] = [];
 // list of tokens recently found during scanning
@@ -117,12 +113,12 @@ var frequencyList = {
         console.log(ticker + "(" + frequencyList[ticker].count + ")");
         // replace with new list
         if (frequencyList.sorted().length > 8)
-            filterListDext = frequencyList.sorted().slice(0, 8);
+            filterList = frequencyList.sorted().slice(0, 8);
     }),
     // return sorted frequencyList
     sorted: (function () {
         // javascript meme magic
-        var sorted = Object.entries(frequencyList).slice(3)
+        var sorted = Object.entries(frequencyList).slice(4)
             .sort(function (a, b) {
             return (b[1].count - a[1].count);
         })
@@ -134,12 +130,27 @@ var frequencyList = {
         }, {});
         return (sorted);
     }),
-    toString: (function () {
-        // sort items and only keep top 25
-        var sorted = Object.entries(frequencyList).slice(3)
+    clear: (function () {
+        // remove everything but methods
+        var sorted = Object.entries(frequencyList).slice(0, 4)
             .sort(function (a, b) {
             return (b[1].count - a[1].count);
-        }).slice(0, 25);
+        })
+            // ???
+            .reduce(function (r, _a) {
+            var _b;
+            var k = _a[0], v = _a[1];
+            return (__assign(__assign({}, r), (_b = {}, _b[k] = v, _b)));
+        }, {});
+        // update list
+        frequencyList = sorted;
+    }),
+    toString: (function () {
+        // sort items and only keep top 25
+        var sorted = Object.entries(frequencyList).slice(4)
+            .sort(function (a, b) {
+            return (b[1].count - a[1].count);
+        });
         var str = "";
         var item;
         for (var _i = 0, sorted_1 = sorted; _i < sorted_1.length; _i++) {
@@ -209,7 +220,7 @@ function parseStream(stream) {
             switch (_a.label) {
                 case 0:
                     console.log("parsing stream");
-                    reg = /\B(\$[a-zA-Z]+\b)(?!;)/gm;
+                    reg = /\B(\$[a-zA-Z][a-zA-Z0-9]+\b)(?!;)/gm;
                     streaming = true;
                     // listen to stream
                     stream
@@ -265,7 +276,7 @@ function parseStream(stream) {
 var running = false;
 var restarting = false;
 // restart streaming immediately 
-function restart() {
+function restart(tickers) {
     return __awaiter(this, void 0, void 0, function () {
         var err_1;
         return __generator(this, function (_a) {
@@ -292,8 +303,10 @@ function restart() {
                 case 4:
                     console.log("okay done waiting");
                     restarting = false;
+                    // reset frequency list
+                    frequencyList.clear();
                     // start over
-                    start();
+                    start(tickers);
                     return [3 /*break*/, 6];
                 case 5:
                     err_1 = _a.sent();
@@ -305,38 +318,56 @@ function restart() {
     });
 }
 exports.restart = restart;
-function start() {
+function start(tickers) {
     return __awaiter(this, void 0, void 0, function () {
-        var lastMessage, startTime, timestamp, stream_1;
+        var previousRun, lastMessage, startingList, startTime, timestamp, stream_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    // client = twitterClient;
-                    main.log("```...waiting for price tickers...```", "social");
-                    lastMessage = frequencyList.toString();
-                    startTime = new Date().toLocaleString();
+                    // this is being called multiple times for some reason
+                    if (running)
+                        return [2 /*return*/];
                     // set running flag
                     running = true;
+                    console.log("here");
+                    // has someone requested specific tickers to start with 
+                    if (tickers) {
+                        filterList = tickers;
+                    }
+                    else {
+                        previousRun = fs.readFileSync("./frequency.txt", "utf-8");
+                        filterList = previousRun.trim().split("\n");
+                    }
+                    // set generic list if there is no filter list
+                    if (filterList.length < 3)
+                        filterList = ["$yfi", "$xrp", "$vet", "$icx", "$core", "$uni", "$lido"];
+                    // client = twitterClient;
+                    main.log("```...waiting for price tickers...```", "social");
+                    lastMessage = frequencyList.toString().slice(0, 25);
+                    startingList = filterList.slice();
+                    startTime = new Date().toLocaleString();
                     _a.label = 1;
                 case 1:
                     if (!(true && !restarting)) return [3 /*break*/, 4];
-                    fs.writeFileSync("./frequency.txt", frequencyList.toString(), function (err) {
+                    fs.writeFileSync("./frequency.txt", frequencyList.toString().slice(0, 25), function (err) {
                         console.log(err);
                     });
                     timestamp = "[" + startTime + " - " + new Date().toLocaleString() + "]" +
-                        "\n\n25 Trending Coins On Twitter: \n\n";
+                        "\n[Starting Filter List: " + startingList + "]" +
+                        "\n\n25 Trending Coins On Twitter (" + frequencyList.toString().split("\n").length + " tickers scanned): \n\n";
                     // don't post duplicates
                     if (frequencyList.toString() !== lastMessage)
                         main.log("```" +
                             timestamp +
-                            frequencyList.toString() +
+                            frequencyList.toString().split("\n").slice(0, 25).join("\n") +
                             "\n\nRecently Scanned: \n\n" +
                             recentlyScanned.join(' ') +
                             "\n```" +
-                            "\nsay 'rs' or 'reset' to restart (takes 1-2 minutes)", "social");
+                            "\nSay 'rs' or 'reset' to refresh (takes 1-2 minutes). List at least three tickers if you want to start filtering with those, ex:" +
+                            "\nrs $rot $yeld $ocean $waves", "social");
                     // update last message
-                    lastMessage = frequencyList.toString();
-                    return [4 /*yield*/, newStream(filterListDext)];
+                    lastMessage = frequencyList.toString().slice(0, 25);
+                    return [4 /*yield*/, newStream(filterList)];
                 case 2:
                     stream_1 = _a.sent();
                     // begin parsing 

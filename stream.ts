@@ -12,12 +12,11 @@ const conf = {
 }
 
 // filter list to be updated
-let filterList:string[] = ["$yfi", "$xrp", "$vet", "$icx", 
-                            "$core", "$uni", "$lido"];
+let filterList:string[]; 
 
 // list from top dextools list 
-let filterListDext:string[] = ["$CORE", "$yfi", "$NBT", "$YRISE", "$PRIA"
-                            , "$UNI", "$TORE", "$encore", "$ARIA", "$pCore"]
+// let filterListDext:string[] = ["$CORE", "$yfi", "$NBT", "$YRISE", "$PRIA"
+                            // , "$UNI", "$TORE", "$encore", "$ARIA", "$pCore"]
 
 interface ListItem {
     name: string,
@@ -97,7 +96,7 @@ let frequencyList:any= {
 
         // replace with new list
         if (frequencyList.sorted().length > 8)
-            filterListDext = frequencyList.sorted().slice(0,8);
+            filterList = frequencyList.sorted().slice(0,8);
 
     }),
 
@@ -268,7 +267,7 @@ let running: boolean = false;
 let restarting: boolean = false;
 
 // restart streaming immediately 
-export async function restart() {
+export async function restart(tickers?: string[]) {
 
     console.log("here");
 
@@ -296,7 +295,7 @@ export async function restart() {
         frequencyList.clear();
 
         // start over
-        start();
+        start(tickers);
 
     }catch(err){
         console.log(err)
@@ -305,7 +304,28 @@ export async function restart() {
 
 }
 
-export async function start() { 
+export async function start(tickers?: string[]) { 
+
+    // this is being called multiple times for some reason
+    if (running)
+        return;
+
+    // set running flag
+    running = true;
+
+    console.log("here");
+
+    // has someone requested specific tickers to start with 
+    if (tickers) {
+        filterList = tickers;
+    } else {
+        let previousRun = fs.readFileSync("./frequency.txt", "utf-8");
+        filterList = previousRun.trim().split("\n");
+    }
+
+    // set generic list if there is no filter list
+    if (filterList.length < 3)
+        filterList = ["$yfi", "$xrp", "$vet", "$icx", "$core", "$uni", "$lido"];
 
     // client = twitterClient;
     main.log("```...waiting for price tickers...```", "social");
@@ -313,11 +333,12 @@ export async function start() {
     // keep track of the previous message sent
     let lastMessage = frequencyList.toString().slice(0, 25);
 
+    // get a copy of the starting list
+    let startingList = filterList.slice();
+
     // get starting time
     let startTime = new Date().toLocaleString();
 
-    // set running flag
-    running = true;
 
     while(true && !restarting) {
 
@@ -325,8 +346,8 @@ export async function start() {
             console.log(err);
         });
 
-
         let timestamp = "[" + startTime + " - " + new Date().toLocaleString() + "]" + 
+        "\n[Starting Filter List: " + startingList +  "]" + 
         "\n\n25 Trending Coins On Twitter (" + frequencyList.toString().split("\n").length + " tickers scanned): \n\n";
 
         // don't post duplicates
@@ -344,7 +365,7 @@ export async function start() {
         lastMessage = frequencyList.toString().slice(0, 25);
 
         // get a new stream
-        let stream = await newStream(filterListDext);
+        let stream = await newStream(filterList);
 
         // begin parsing 
         parseStream(stream);
