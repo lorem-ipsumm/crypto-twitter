@@ -363,8 +363,7 @@ function start(tickers) {
                             "\n\nRecently Scanned: \n\n" +
                             recentlyScanned.join(' ') +
                             "\n```" +
-                            "\nSay 'rs' or 'reset' to refresh (takes 1-2 minutes). List at least three tickers if you want to start filtering with those, ex:" +
-                            "\nrs $rot $yeld $ocean $waves", "social");
+                            "\nsay 'rs' or 'reset' to refresh (takes 1-2 minutes)", "social");
                     // update last message
                     lastMessage = frequencyList.toString().slice(0, 25);
                     return [4 /*yield*/, newStream(filterList)];

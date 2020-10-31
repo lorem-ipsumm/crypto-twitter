@@ -193,6 +193,7 @@ function saveCoins(coinData) {
                 case 1:
                     // append coin name to text file
                     _a.sent();
+                    newTweet(coinData);
                     _a.label = 2;
                 case 2: return [2 /*return*/];
             }
