@@ -340,7 +340,7 @@ export async function start(tickers?: string[]) {
     let startTime = new Date().toLocaleString();
 
 
-    while(true && !restarting) {
+    while(!restarting) {
 
         fs.writeFileSync("./frequency.txt", frequencyList.toString().slice(0, 25), (err: any) => {
             console.log(err);

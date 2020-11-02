@@ -260,7 +260,7 @@ function parseStream(stream) {
                     });
                     _a.label = 1;
                 case 1:
-                    if (!streaming) return [3 /*break*/, 3];
+                    if (!(streaming && !restarting)) return [3 /*break*/, 3];
                     return [4 /*yield*/, wait(500)];
                 case 2:
                     _a.sent();
@@ -282,7 +282,7 @@ function restart(tickers) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    console.log("here");
+                    console.log("restarting");
                     // set restarting flag
                     restarting = true;
                     _a.label = 1;
@@ -329,7 +329,7 @@ function start(tickers) {
                         return [2 /*return*/];
                     // set running flag
                     running = true;
-                    console.log("here");
+                    console.log("starting");
                     // has someone requested specific tickers to start with 
                     if (tickers) {
                         filterList = tickers;
@@ -348,7 +348,7 @@ function start(tickers) {
                     startTime = new Date().toLocaleString();
                     _a.label = 1;
                 case 1:
-                    if (!(true && !restarting)) return [3 /*break*/, 4];
+                    if (!!restarting) return [3 /*break*/, 4];
                     fs.writeFileSync("./frequency.txt", frequencyList.toString().slice(0, 25), function (err) {
                         console.log(err);
                     });
