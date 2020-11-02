@@ -257,7 +257,7 @@ async function parseStream(stream: any) {
     })
 
     // erase stream when streaming is over
-    while(streaming) await wait(500);
+    while(streaming && !restarting) await wait(500);
         console.log("done streaming");
 
 }
@@ -269,7 +269,7 @@ let restarting: boolean = false;
 // restart streaming immediately 
 export async function restart(tickers?: string[]) {
 
-    console.log("here");
+    console.log("restarting");
 
     // set restarting flag
     restarting = true;
@@ -313,7 +313,7 @@ export async function start(tickers?: string[]) {
     // set running flag
     running = true;
 
-    console.log("here");
+    console.log("starting");
 
     // has someone requested specific tickers to start with 
     if (tickers) {
