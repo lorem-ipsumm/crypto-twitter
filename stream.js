@@ -329,7 +329,7 @@ function start(tickers) {
                         return [2 /*return*/];
                     // set running flag
                     running = true;
-                    console.log("starting");
+                    // console.log("starting");
                     // has someone requested specific tickers to start with 
                     if (tickers) {
                         filterList = tickers;

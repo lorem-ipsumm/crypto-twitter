@@ -313,7 +313,7 @@ export async function start(tickers?: string[]) {
     // set running flag
     running = true;
 
-    console.log("starting");
+    // console.log("starting");
 
     // has someone requested specific tickers to start with 
     if (tickers) {

@@ -5,6 +5,7 @@ const Twitter = require("twitter-lite");
 const hooman = require('hooman');
 const CoinCodex = require('coincodex-api');
 const Discord = require('discord.js');
+const axios = require('axios');
 const discord = new Discord.Client();
 
 // create CoinCodex API client
@@ -19,34 +20,12 @@ const Config = require("./config");
 // comment this section out if you don't have keys and
 // and you just want to scrape Coingecko
 
-
-
 const client = new Twitter({
     consumer_key: Config.consumer_key,
     consumer_secret: Config.consumer_secret,
     access_token_key: Config.access_token_key,
     access_token_secret: Config.access_token_secret
 });
-
-/*
-client.get("account/verify_credentials")
-.then(async (res: any) => {
-
-    const rateLimits = await client.get("statuses/lookup", {
-        id: "1016078154497048576",
-        tweet_mode: "extended"
-    });
-
-    console.log(rateLimits);
-
-
-})
-.catch((err: any) => {
-    console.log("err");
-})
-
-t();
-*/
 
 // login to discord
 discord.login(Config.DISCORD_TOKEN);
@@ -64,6 +43,9 @@ interface CoinData {
     site: string
 }
 
+export async function wait(milliseconds: number) {
+    await new Promise(resolve => setTimeout(resolve, milliseconds));
+}
 
 // log output and error message in a discord server
 export async function log(message: string, where: string, err?: boolean | null) {
@@ -177,36 +159,43 @@ async function saveCoins(coinData: CoinData) {
 // scrape coinmarketcap
 async function coinmarketcapScrape() {
 
-    // log("scraping CoinMarketCap");
-
     // try and read coins.txt and make get request
-    let html = "";
+    let data: any;
 
     try {
-        const response = await hooman.get('https://coinmarketcap.com/new/');
-        html = response.body;
+
+        const res = await axios.get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest', {
+            headers: {
+                'X-CMC_PRO_API_KEY': Config.CMC_API_KEY
+            },
+            params: { 
+                sort: "date_added",
+                sort_dir: "asc"
+            }
+        });
+
+        // get response
+        data = res.data.data;
+
     } catch(err) {
         log(err, "gems", true);
         return;
     }
 
     // load html with cheerio
-    const $ = await cheerio.load(html);
+    // const $ = await cheerio.load(html);
 
-    // go through all table items
-    $('tr.cmc-table-row').each(async (i, elem) => {
-
-        let coinName: string;
-        let coinTicker: string;
+    // iterate through latest tokens
+    for (const token of data) {
 
         // name and ticker
-        coinName = $(elem).find(".cmc-table__column-name").text().trim();
-        coinTicker = $(elem).find(".cmc-table__cell--sort-by__symbol").text().trim();
+        let coinName = token.name;
+        let coinTicker = token.symbol;
 
         // get data
-        let price = $(elem).find(".cmc-table__cell--sort-by__price").text().trim();
-        let volume = $(elem).find(".cmc-table__cell--sort-by__volume-24-h").text().trim();
-        let url = "https://www.coinmarketcap.com" + $(elem).find(".cmc-table__column-name a").attr("href");
+        let price = token.quote.USD.price;
+        let volume = token.quote.USD.volume_24h;
+        let url = "https://coinmarketcap.com/currencies/" + token.slug;
 
         const coinData:CoinData = {
             name: coinName,
@@ -217,10 +206,9 @@ async function coinmarketcapScrape() {
             site: "CoinMarketCap"
         };
 
-
         saveCoins(coinData);
-    });
 
+    }
 
 }
 
@@ -228,41 +216,52 @@ async function coinmarketcapScrape() {
 async function coingeckoScrape() {
 
     // log("scraping CoinGecko");
+    console.log("scraping");
 
-    let html = "";
+    let data: any;
 
     try {
-        const response = await hooman.get('https://www.coingecko.com/en/coins/recently_added');
-        html = response.body;
+
+        const res = await axios.get('https://api.coingecko.com/api/v3/coins/list');
+
+        // get response
+        data = res.data;
+
+
     } catch(err) {
         log(err, "gems", true);
         return;
     }
 
-    // load html with cheerio
-    const $ = await cheerio.load(html);
+    let coinData: CoinData;
 
-    // go through all table items
-    $('tr', 'tbody').each(async (i, elem) => {
+    // iterate through latest tokens
+    for (const token of data) {
 
-        let coinName: string;
-        let coinTicker: string;
 
-        // get token info
-        let nameInfo = $(elem).find(".coin-name a").text().trim().split("\n").join().split(",,");
-        coinName = nameInfo[0];
-        coinTicker = nameInfo[1];
-        coinTicker = coinTicker.trim();
+        // name and ticker
+        let coinName = token.name;
+        let coinTicker = token.symbol;
+        let price;
+        let volume;
+        let url = "";
 
-        // get data
-        let price = $(elem).find(".td-price span").text().trim();
-        // let hourChange = $(elem).find(".td-change1h span").text().trim();
-        // let dayChange = $(elem).find(".td-change24h span").text().trim();
-        let volume = $(elem).find(".td-liquidity_score span").text().trim();
-        // let marketCap = $(elem).find(".td-market_cap").text().trim();
-        let url = "https://www.coingecko.com" + $(elem).find(".coin-name a").attr("href");
+        // a second request needs to be made for the price & volume data
+        if (coins.indexOf(coinName + "(" + coinTicker + "): CoinGecko") === -1) {
 
-        const coinData:CoinData = {
+            // make coin data request
+            let extraData = await axios.get('https://api.coingecko.com/api/v3/coins/' + token.id);
+
+            // get data
+            extraData = extraData.data.tickers[0];
+            price = extraData.converted_last.usd;
+            volume = extraData.converted_volume.usd;
+            url = "https://www.coingecko.com/en/coins/" + token.id;
+
+        }
+        
+        // set data
+        coinData = {
             name: coinName,
             ticker: coinTicker,
             price: price,
@@ -273,7 +272,8 @@ async function coingeckoScrape() {
 
         saveCoins(coinData);
 
-    });
+    }
+
 }
 
 
@@ -365,6 +365,7 @@ discord.on("ready", async () => {
     // start streaming tweets
     twitterStream.start();
 
+
     // load saved coins 
     if (!loadCoins()) {
         log("coins.txt failed to load", "gems", true)
@@ -372,7 +373,7 @@ discord.on("ready", async () => {
     }
 
     // start first scrape
-    log("starting", "gems");
+    // log("starting", "gems");
     scrape();
 
     // scrape every 15 minutes

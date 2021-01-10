@@ -43,6 +43,7 @@ var Twitter = require("twitter-lite");
 var hooman = require('hooman');
 var CoinCodex = require('coincodex-api');
 var Discord = require('discord.js');
+var axios = require('axios');
 var discord = new Discord.Client();
 // create CoinCodex API client
 var codex = new CoinCodex();
@@ -59,30 +60,24 @@ var client = new Twitter({
     access_token_key: Config.access_token_key,
     access_token_secret: Config.access_token_secret
 });
-/*
-client.get("account/verify_credentials")
-.then(async (res: any) => {
-
-    const rateLimits = await client.get("statuses/lookup", {
-        id: "1016078154497048576",
-        tweet_mode: "extended"
-    });
-
-    console.log(rateLimits);
-
-
-})
-.catch((err: any) => {
-    console.log("err");
-})
-
-t();
-*/
 // login to discord
 discord.login(Config.DISCORD_TOKEN);
 // variable to hold coins.txt data
 // TODO: convert to JSON / easier to parse format
 var coins = "";
+function wait(milliseconds) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, milliseconds); })];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.wait = wait;
 // log output and error message in a discord server
 function log(message, where, err) {
     return __awaiter(this, void 0, void 0, function () {
@@ -203,49 +198,50 @@ function saveCoins(coinData) {
 // scrape coinmarketcap
 function coinmarketcapScrape() {
     return __awaiter(this, void 0, void 0, function () {
-        var html, response, err_1, $;
-        var _this = this;
+        var data, res, err_1, _i, data_1, token, coinName, coinTicker, price, volume, url, coinData;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    html = "";
-                    _a.label = 1;
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, axios.get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest', {
+                            headers: {
+                                'X-CMC_PRO_API_KEY': Config.CMC_API_KEY
+                            },
+                            params: {
+                                sort: "date_added",
+                                sort_dir: "asc"
+                            }
+                        })];
                 case 1:
-                    _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, hooman.get('https://coinmarketcap.com/new/')];
+                    res = _a.sent();
+                    // get response
+                    data = res.data.data;
+                    return [3 /*break*/, 3];
                 case 2:
-                    response = _a.sent();
-                    html = response.body;
-                    return [3 /*break*/, 4];
-                case 3:
                     err_1 = _a.sent();
                     log(err_1, "gems", true);
                     return [2 /*return*/];
-                case 4: return [4 /*yield*/, cheerio.load(html)];
-                case 5:
-                    $ = _a.sent();
-                    // go through all table items
-                    $('tr.cmc-table-row').each(function (i, elem) { return __awaiter(_this, void 0, void 0, function () {
-                        var coinName, coinTicker, price, volume, url, coinData;
-                        return __generator(this, function (_a) {
-                            // name and ticker
-                            coinName = $(elem).find(".cmc-table__column-name").text().trim();
-                            coinTicker = $(elem).find(".cmc-table__cell--sort-by__symbol").text().trim();
-                            price = $(elem).find(".cmc-table__cell--sort-by__price").text().trim();
-                            volume = $(elem).find(".cmc-table__cell--sort-by__volume-24-h").text().trim();
-                            url = "https://www.coinmarketcap.com" + $(elem).find(".cmc-table__column-name a").attr("href");
-                            coinData = {
-                                name: coinName,
-                                ticker: coinTicker,
-                                price: price,
-                                volume: volume,
-                                url: url,
-                                site: "CoinMarketCap"
-                            };
-                            saveCoins(coinData);
-                            return [2 /*return*/];
-                        });
-                    }); });
+                case 3:
+                    // load html with cheerio
+                    // const $ = await cheerio.load(html);
+                    // iterate through latest tokens
+                    for (_i = 0, data_1 = data; _i < data_1.length; _i++) {
+                        token = data_1[_i];
+                        coinName = token.name;
+                        coinTicker = token.symbol;
+                        price = token.quote.USD.price;
+                        volume = token.quote.USD.volume_24h;
+                        url = "https://coinmarketcap.com/currencies/" + token.slug;
+                        coinData = {
+                            name: coinName,
+                            ticker: coinTicker,
+                            price: price,
+                            volume: volume,
+                            url: url,
+                            site: "CoinMarketCap"
+                        };
+                        saveCoins(coinData);
+                    }
                     return [2 /*return*/];
             }
         });
@@ -254,51 +250,62 @@ function coinmarketcapScrape() {
 // scrape the recently added page
 function coingeckoScrape() {
     return __awaiter(this, void 0, void 0, function () {
-        var html, response, err_2, $;
-        var _this = this;
+        var data, res, err_2, coinData, _i, data_2, token, coinName, coinTicker, price, volume, url, extraData;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    html = "";
+                    // log("scraping CoinGecko");
+                    console.log("scraping");
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, hooman.get('https://www.coingecko.com/en/coins/recently_added')];
+                    return [4 /*yield*/, axios.get('https://api.coingecko.com/api/v3/coins/list')];
                 case 2:
-                    response = _a.sent();
-                    html = response.body;
+                    res = _a.sent();
+                    // get response
+                    data = res.data;
                     return [3 /*break*/, 4];
                 case 3:
                     err_2 = _a.sent();
                     log(err_2, "gems", true);
                     return [2 /*return*/];
-                case 4: return [4 /*yield*/, cheerio.load(html)];
+                case 4:
+                    _i = 0, data_2 = data;
+                    _a.label = 5;
                 case 5:
-                    $ = _a.sent();
-                    // go through all table items
-                    $('tr', 'tbody').each(function (i, elem) { return __awaiter(_this, void 0, void 0, function () {
-                        var coinName, coinTicker, nameInfo, price, volume, url, coinData;
-                        return __generator(this, function (_a) {
-                            nameInfo = $(elem).find(".coin-name a").text().trim().split("\n").join().split(",,");
-                            coinName = nameInfo[0];
-                            coinTicker = nameInfo[1];
-                            coinTicker = coinTicker.trim();
-                            price = $(elem).find(".td-price span").text().trim();
-                            volume = $(elem).find(".td-liquidity_score span").text().trim();
-                            url = "https://www.coingecko.com" + $(elem).find(".coin-name a").attr("href");
-                            coinData = {
-                                name: coinName,
-                                ticker: coinTicker,
-                                price: price,
-                                volume: volume,
-                                url: url,
-                                site: "CoinGecko"
-                            };
-                            saveCoins(coinData);
-                            return [2 /*return*/];
-                        });
-                    }); });
-                    return [2 /*return*/];
+                    if (!(_i < data_2.length)) return [3 /*break*/, 9];
+                    token = data_2[_i];
+                    coinName = token.name;
+                    coinTicker = token.symbol;
+                    price = void 0;
+                    volume = void 0;
+                    url = "";
+                    if (!(coins.indexOf(coinName + "(" + coinTicker + "): CoinGecko") === -1)) return [3 /*break*/, 7];
+                    return [4 /*yield*/, axios.get('https://api.coingecko.com/api/v3/coins/' + token.id)];
+                case 6:
+                    extraData = _a.sent();
+                    // get data
+                    extraData = extraData.data.tickers[0];
+                    price = extraData.converted_last.usd;
+                    volume = extraData.converted_volume.usd;
+                    url = "https://www.coingecko.com/en/coins/" + token.id;
+                    _a.label = 7;
+                case 7:
+                    // set data
+                    coinData = {
+                        name: coinName,
+                        ticker: coinTicker,
+                        price: price,
+                        volume: volume,
+                        url: url,
+                        site: "CoinGecko"
+                    };
+                    saveCoins(coinData);
+                    _a.label = 8;
+                case 8:
+                    _i++;
+                    return [3 /*break*/, 5];
+                case 9: return [2 /*return*/];
             }
         });
     });
@@ -397,7 +404,7 @@ discord.on("ready", function () { return __awaiter(void 0, void 0, void 0, funct
             return [2 /*return*/];
         }
         // start first scrape
-        log("starting", "gems");
+        // log("starting", "gems");
         scrape();
         // scrape every 15 minutes
         setInterval(function () {
