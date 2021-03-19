@@ -38,7 +38,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var cheerio = require("cheerio");
 var fs = require("fs");
-var twitterStream = require("./stream");
 var Twitter = require("twitter-lite");
 var hooman = require('hooman');
 var CoinCodex = require('coincodex-api');
@@ -285,10 +284,15 @@ function coingeckoScrape() {
                 case 6:
                     extraData = _a.sent();
                     // get data
-                    extraData = extraData.data.tickers[0];
-                    price = extraData.converted_last.usd;
-                    volume = extraData.converted_volume.usd;
-                    url = "https://www.coingecko.com/en/coins/" + token.id;
+                    try {
+                        extraData = extraData.data.tickers[0];
+                        price = extraData.converted_last.usd;
+                        volume = extraData.converted_volume.usd;
+                        url = "https://www.coingecko.com/en/coins/" + token.id;
+                    }
+                    catch (e) {
+                        return [2 /*return*/];
+                    }
                     _a.label = 7;
                 case 7:
                     // set data
@@ -376,28 +380,34 @@ discord.on("ready", function () { return __awaiter(void 0, void 0, void 0, funct
         reg = /\B(\$[a-zA-Z][a-zA-Z0-9]+\b)(?!;)/gm;
         // listen for messages
         discord.on("message", function (message) {
+            /*
+    
             // is this in the social channel?
             if (message.channel.id !== Config.DISCORD_CHANNEL_SOCIAL)
                 return;
+    
             // get the message content
-            var text = message.content;
+            const text = message.content;
+    
             // restart streaming and pass in requested tickers
             // if there are at least 3
             if (text.match(reg) && text.match(reg).length >= 3)
                 twitterStream.restart(text.match(reg));
             else
                 twitterStream.restart();
+    
             if (message) {
+                
                 try {
-                    message["delete"]({ timeout: 500 });
-                }
-                catch (e) {
+                    message.delete({timeout: 500})
+                } catch (e) {
                     return;
                 }
             }
+            */
         });
         // start streaming tweets
-        twitterStream.start();
+        // twitterStream.start();
         // load saved coins 
         if (!loadCoins()) {
             log("coins.txt failed to load", "gems", true);

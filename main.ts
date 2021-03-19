@@ -253,10 +253,14 @@ async function coingeckoScrape() {
             let extraData = await axios.get('https://api.coingecko.com/api/v3/coins/' + token.id);
 
             // get data
-            extraData = extraData.data.tickers[0];
-            price = extraData.converted_last.usd;
-            volume = extraData.converted_volume.usd;
-            url = "https://www.coingecko.com/en/coins/" + token.id;
+            try {
+                extraData = extraData.data.tickers[0];
+                price = extraData.converted_last.usd;
+                volume = extraData.converted_volume.usd;
+                url = "https://www.coingecko.com/en/coins/" + token.id;
+            } catch (e) {
+                return;
+            }
 
         }
         
@@ -337,6 +341,8 @@ discord.on("ready", async () => {
     // listen for messages
     discord.on("message", (message: any) => {
 
+        /*
+
         // is this in the social channel?
         if (message.channel.id !== Config.DISCORD_CHANNEL_SOCIAL)
             return;
@@ -359,11 +365,12 @@ discord.on("ready", async () => {
                 return;
             }
         }
+        */
         
     })
 
     // start streaming tweets
-    twitterStream.start();
+    // twitterStream.start();
 
 
     // load saved coins 
