@@ -142,14 +142,14 @@ async function saveCoins(coinData: CoinData) {
         // this is for if the bot breaks and misses coins
         // await sleep(1000);
 
-        log("New " + coinData.site + " coin found: " + coinData.name + " / $" + coinData.ticker, "gems");
+        console.log("New " + coinData.site + " coin found: " + coinData.name + " / $" + coinData.ticker, "gems");
 
         // append coin name to text file
         await fs.appendFile("coins.txt", "\n" + coinData.name+ "(" + coinData.ticker + "): " + coinData.site, (err) => {
             if (err) log(err.message, "gems", true);
         });
 
-        newTweet(coinData);
+        // newTweet(coinData);
 
     }
 
@@ -229,7 +229,7 @@ async function coingeckoScrape() {
 
 
     } catch(err) {
-        log(err, "gems", true);
+        console.log(err, "gems", true);
         return;
     }
 
@@ -242,12 +242,13 @@ async function coingeckoScrape() {
         // name and ticker
         let coinName = token.name;
         let coinTicker = token.symbol;
-        let price;
-        let volume;
-        let url = "";
+        let price = '';
+        let volume = '';
+        let url = '';
+        console.log(coinName);
 
         // a second request needs to be made for the price & volume data
-        if (coins.indexOf(coinName + "(" + coinTicker + "): CoinGecko") === -1) {
+        if (false && coins.indexOf(coinName + "(" + coinTicker + "): CoinGecko") === -1) {
 
             // make coin data request
             let extraData = await axios.get('https://api.coingecko.com/api/v3/coins/' + token.id);
@@ -259,7 +260,8 @@ async function coingeckoScrape() {
                 volume = extraData.converted_volume.usd;
                 url = "https://www.coingecko.com/en/coins/" + token.id;
             } catch (e) {
-                return;
+                console.log("error: ", coinName)
+                continue;
             }
 
         }
